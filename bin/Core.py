@@ -9,9 +9,19 @@ RESOLUTION = WIDTH, HEIGHT = 640, 480	# might try adding custom resolutions but 
 GUI = os.path.abspath('gui')
 files = os.listdir(GUI)
 
+def imgscale(image, target_width):
+    original_width, original_height = image.get_size()
+    aspect_ratio = original_width / original_height
+    target_height = int(target_width / aspect_ratio)
+    return pygame.transform.scale(image, (target_width, target_height))
+
 for file_name in files:
     image_name = file_name[:-4].upper()
-    globals()[image_name] = pygame.image.load(os.path.join(GUI, file_name))
+    image = pygame.image.load(os.path.join(GUI, file_name))
+    globals()[image_name] = imgscale(image, 64)
+
+
+HEXW, HEXH = HEX_DEF.get_size()
 
 pygame.init()
 display = pygame.display.set_mode(RESOLUTION)
