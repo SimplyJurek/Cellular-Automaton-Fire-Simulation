@@ -3,6 +3,7 @@ from bin.Core import ON, OFF, WIDTH, HEIGHT, \
                      display, clock, font1, font2, font3, font4, \
 			         Text, HEXW, HEXH
 import bin.Grid as G
+import bin.Automaton as A
 
 def splash(): # splash screen
 	running = True
@@ -44,7 +45,7 @@ def game():
     r = HEXW/2
     r_2 = r/2
 
-    hexy = G.genGrid(8,12)
+    automaton = A.HexAutomaton(8,12)
 
     running = True
     
@@ -68,12 +69,15 @@ def game():
 
         mx, my = pygame.mouse.get_pos()
 
-        for hex in hexy:
+        for hex in automaton.grid:
             hex.draw()
             if hex.collidepoint(mx, my):
                 if click:
                         hex.cycleState()
             
+        # DO ODKOMENTOWANIA PO ZMIANIE GRIDA NA TABLICE DWUWYMIAROWA   
+        #automaton.update()
+        #automaton.draw()
 
         pygame.display.update()
         clock.tick(20)

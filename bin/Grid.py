@@ -1,6 +1,8 @@
 import bin.Core as C
 import bin.Hex as H
 
+#TODO - Zmodyfikować grida aby był tablica dwuwymiarowa, ulatwi to pozniejsze wplywanie komorek na siebie wzajemnie i umozliwi dzialanie klasy automatu
+
 def genGrid(nHeight, nWidth):
     arrGrid = [H.Hex(20, 20)]
     nModifier = 0
@@ -13,5 +15,5 @@ def genGrid(nHeight, nWidth):
             nModifier = 0
         else: 
             nModifier = 1
-    
+    print(arrGrid)
     return arrGrid
