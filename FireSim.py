@@ -2,7 +2,7 @@ import pygame, os
 from bin.Core import ON, OFF, WIDTH, HEIGHT, \
                      display, clock, font1, font2, font3, font4, \
 			         Text, HEXW, HEXH
-import bin.Hex as H
+import bin.Grid as G
 
 def splash(): # splash screen
 	running = True
@@ -44,11 +44,7 @@ def game():
     r = HEXW/2
     r_2 = r/2
 
-    hex1 = H.Hex(20, 20)
-    hex2 = H.Hex(20, 20+HEXH)
-    hex3 = H.Hex(20+(HEXW-r_2), 20+HEXH/2)
-
-    hexy = [hex1, hex2, hex3]
+    hexy = G.genGrid(8,12)
 
     running = True
     

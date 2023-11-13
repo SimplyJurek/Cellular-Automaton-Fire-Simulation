@@ -1,4 +1,4 @@
-import bin.Core as c
+import bin.Core as C
 
 class Hex:
     def __init__(self, pos_x_left_top, pos_y_left_top):
@@ -9,11 +9,11 @@ class Hex:
     def draw(self):
         match self.state:
             case False:
-                c.display.blit(c.HEX_DEF, self.left_top)
+                C.display.blit(C.HEX_DEF, self.left_top)
             case True:
-                c.display.blit(c.HEX_FIRE, self.left_top)
+                C.display.blit(C.HEX_FIRE, self.left_top)
             case None:
-                c.display.blit(c.HEX_ASH, self.left_top)
+                C.display.blit(C.HEX_ASH, self.left_top)
 
     def collidepoint(self, mouse_pos_x, mouse_pos_y):
         #print(mouse_pos_x, "/", mouse_pos_y, " === ", self.left_top[0], "-", self.left_top[0] + 64, "/", self.left_top[0], "-", self.left_top[0] + 64)
