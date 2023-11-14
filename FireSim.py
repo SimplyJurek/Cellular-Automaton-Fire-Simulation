@@ -41,46 +41,42 @@ def splash(): # splash screen
 # -----------------------------------------------------------------------------------------------------
 
 def game():
-
-    r = HEXW/2
-    r_2 = r/2
-
-    automaton = A.HexAutomaton(8,12)
+    automaton = A.HexAutomaton(8, 6)  # Assuming this creates the grid
 
     running = True
     
     while running:
         click = False    
         for event in pygame.event.get():
-            if event.type==pygame.QUIT:
-                running=False
+            if event.type == pygame.QUIT:
+                running = False
                 pygame.quit()
-                exit()				
+                exit()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RETURN:
-                    running=False
+                    running = False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     click = True
             
         display.fill(ON)
 
-        pygame.draw.rect(display,OFF,[10,10,WIDTH-20,HEIGHT-20])		
+        pygame.draw.rect(display, OFF, [10, 10, WIDTH-20, HEIGHT-20])
 
         mx, my = pygame.mouse.get_pos()
 
-        for hex in automaton.grid:
-            hex.draw()
-            if hex.collidepoint(mx, my):
-                if click:
+        for row in automaton.grid:
+            for hex in row:
+                hex.draw()
+                if hex.collidepoint(mx, my):
+                    if click:
                         hex.cycleState()
             
-        # DO ODKOMENTOWANIA PO ZMIANIE GRIDA NA TABLICE DWUWYMIAROWA   
-        #automaton.update()
-        #automaton.draw()
+        automaton.draw()  # Assuming this method draws the entire grid
+        automaton.update()
 
         pygame.display.update()
-        clock.tick(20)
+        clock.tick(2)
 
 # -----------------------------------------------------------------------------------------------------
 

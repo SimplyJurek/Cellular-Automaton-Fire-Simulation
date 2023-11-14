@@ -17,7 +17,7 @@ class HexAutomaton:
     def update(self):
         for i in range(self.rows):
             for j in range(self.cols):
-                print(type(self.grid[i]))
+                # print(type(self.grid[i]))
                 current_hex = self.grid[i][j]
                 if current_hex.state is True:
                     # Propagate True state to neighboring hexagons
