@@ -1,7 +1,7 @@
 import pygame, os
 from bin.Core import ON, OFF, WIDTH, HEIGHT, \
                      display, clock, font1, font2, font3, font4, \
-			         Text, HEXW, HEXH
+			         Text, HEXW, HEXH, switchDebug, DEBUGMODE
 import bin.Grid as G
 import bin.Automaton as A
 
@@ -40,10 +40,17 @@ def splash(): # splash screen
 
 # -----------------------------------------------------------------------------------------------------
 
-def game():
-    automaton = A.HexAutomaton(8, 6)  # Assuming this creates the grid
+def grid_iterator(arrGrid):
+    for row in arrGrid:
+        for hex_obj in row:
+            yield hex_obj
 
+def game():
     running = True
+    automaton = A.HexAutomaton(7, 12)
+
+    grid_iter = grid_iterator(automaton.grid)
+    displayNeighbors, displayNeighborsSTOP = False, False
     
     while running:
         click = False    
@@ -53,8 +60,17 @@ def game():
                 pygame.quit()
                 exit()
             if event.type == pygame.KEYDOWN:
+                print(f"Key pressed: {pygame.key.name(event.key)}")
                 if event.key == pygame.K_RETURN:
                     running = False
+                if event.key == pygame.K_F10:
+                    switchDebug()
+                if event.key == pygame.K_F9:
+                    if displayNeighbors:
+                        displayNeighbors = False
+                        displayNeighborsSTOP = True
+                    else:
+                        displayNeighbors = True            
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     click = True
@@ -67,13 +83,27 @@ def game():
 
         for row in automaton.grid:
             for hex in row:
-                hex.draw()
                 if hex.collidepoint(mx, my):
                     if click:
                         hex.cycleState()
             
         automaton.draw()  # Assuming this method draws the entire grid
-        automaton.update()
+
+        if displayNeighbors:
+            try:
+                current_hex = next(grid_iter)
+
+                current_hex.highlightNeighbors()
+                # current_hex.drawDebug()
+
+                if displayNeighborsSTOP: 
+                    displayNeighborsSTOP = False
+                    raise StopIteration
+            except StopIteration:
+                displayNeighbors = False
+                grid_iter = grid_iterator(automaton.grid)
+
+        # automaton.update() not workins after fixing 2d grid
 
         pygame.display.update()
         clock.tick(2)

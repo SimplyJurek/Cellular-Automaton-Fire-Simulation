@@ -1,18 +1,21 @@
 import bin.Core as C
 import bin.Hex as H
 
-#TODO - Zmodyfikować grida aby był tablica dwuwymiarowa, ulatwi to pozniejsze wplywanie komorek na siebie wzajemnie i umozliwi dzialanie klasy automatu
+windowOffset = 20 # odleglosć od ramki okna
 
-def genGrid(nHeight, nWidth): # 8 /12
+def genGrid(nHeight, nWidth):
     arrGrid = []
-    nModifier = 0
-    for nRow in range(nHeight):
-        row = []
-        for nCell in range(nWidth):
-            if nRow % 2 == 0:
-                row.append(H.Hex(20 + nCell*88, 20 + nRow*26))
-            else:
-                row.append(H.Hex(64 + nCell*88, 20 + nRow*26))
-        arrGrid.append(row)
-        nModifier = 1 - nModifier
+
+    for nColumn in range(nWidth):
+        column = []
+        voffset = windowOffset if nColumn % 2 == 0 else C.HEXH / 2 + windowOffset
+        for nCell in range(nHeight):
+            column.append(H.Hex(windowOffset + nColumn * (C.HEXW * 3/4), voffset + nCell * C.HEXH))
+        arrGrid.append(column)
+
+    for col_index, column in enumerate(arrGrid):
+        for hex_index, hex_obj in enumerate(column):
+            hex_obj.findNeighbors(arrGrid, [col_index, hex_index])
+                
+
     return arrGrid

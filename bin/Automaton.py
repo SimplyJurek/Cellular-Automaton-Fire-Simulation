@@ -1,17 +1,21 @@
-import bin.Hex as h
-import bin.Grid as g
+import bin.Hex as H
+import bin.Grid as G
+import bin.Core as C
 
 class HexAutomaton:
     def __init__(self, rows, cols):
         self.rows = rows
         self.cols = cols
-        self.grid = g.genGrid(rows,cols)
+        self.grid = G.genGrid(rows,cols)
 
-    def draw(self):
-        for row in self.grid:
-            for hex_obj in row:
-                hex_obj.draw()
-
+    def draw(self):        
+        for col_index, column in enumerate(self.grid):
+            for hex_index, hex_obj in enumerate(column):
+                match C.getDebug():
+                    case 0: debugText = None
+                    case 1: debugText = f"{col_index}, {hex_index}"
+                    case 2: debugText = "DEBUGMODE_2"
+                hex_obj.draw(debugText)
 
     #PROBLEM - automat dziala na gridzie dwuwymiarowym, a grid tworzy komorki zapisane w jednowymiarowej tablicy
     def update(self):

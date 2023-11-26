@@ -5,6 +5,8 @@ ON = (255,255,255)		# can be changed but couldn't figure out how to change graph
 
 RESOLUTION = WIDTH, HEIGHT = 640, 480	# might try adding custom resolutions but grid system isnt prepared
 
+DEBUGMODE = 0
+
 # initializing game files and pygame
 GUI = os.path.abspath('gui')
 files = os.listdir(GUI)
@@ -30,10 +32,20 @@ display = pygame.display.set_mode(RESOLUTION)
 pygame.display.set_caption('FireSim')
 clock = pygame.time.Clock()
 
+font = pygame.font.SysFont("Arial", 10)
 font1 = pygame.font.SysFont("Arial", 14)
 font2 = pygame.font.SysFont("Arial", 22)
 font3 = pygame.font.SysFont("Arial", 34)
 font4 = pygame.font.SysFont("Arial", 64)
+
+def switchDebug():
+    global DEBUGMODE
+    DEBUGMODE += 1
+    if DEBUGMODE == 3: DEBUGMODE = 0
+
+def getDebug():
+    global DEBUGMODE
+    return DEBUGMODE
 
 class Text:
     def __init__(self, text, pos_x_center, pos_y_center, font):
