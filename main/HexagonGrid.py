@@ -16,7 +16,6 @@ class HexagonTile:
     radius: float
     position: Tuple[float, float]
     colour: Tuple[int, ...]
-    # state: int
     highlight_offset: int = 3
     max_highlight_ticks: int = 15
 
@@ -24,12 +23,11 @@ class HexagonTile:
         self.vertices = self.compute_vertices()
         self.highlight_tick = 0
         self.state = 0
+        self.health = 100
 
     def update(self):
 
-        highlight_tick = self.highlight_tick
-
-        # neighbours_list = self.compute_neighbours(hexlist)
+        # neighbours_list = self.compute_neighbours(hexagons_copy)
         # neighbour_state_counter = 0
 
         # for neighbour in neighbours_list:
@@ -37,15 +35,19 @@ class HexagonTile:
         #         neighbour_state_counter += 1
 
         # if self.state == 0 and neighbour_state_counter >= 2:
-        #     state = 1
+        #     self.state = 1
 
         if self.highlight_tick > 0:
             self.highlight_tick -= 1
 
-        if self.state == 1:
-            self.colour = [120, 0, 0]
+        if self.state == 1 and self.health > 0:
+            self.colour = [120, 10, 0]
+            self.health -= 1
+        if self.state == 1 and self.health <= 0:
+            self.state = 2
+            self.colour = [60, 60, 60]
 
-        # return create_hexagon(self.position, self.radius,)
+        # return hexagons_copy
     
     # def update_grid(self,hexlist):
     #     nexthexlist = hexlist

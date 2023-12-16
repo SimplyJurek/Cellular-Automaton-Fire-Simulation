@@ -1,9 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sun Jan 23 13:50:07 2022
-
-@author: richa
-"""
 import random
 from typing import List
 from typing import Tuple
@@ -14,8 +8,8 @@ from HexagonGrid import HexagonTile
 
 # pylint: disable=no-member
 
-hexradius = 5
-gridsize = 150
+hexradius = 50
+gridsize = 10
 
 def create_hexagon(position, radius = hexradius, flat_top=False) -> HexagonTile:
     """Creates a hexagon tile at the specified position"""
@@ -85,14 +79,15 @@ def main():
                     hexagon for hexagon in hexagons if hexagon.collide_with_point(mouse_pos)
                 ]
                 for hexagon in colliding_hexagons:
-                    hexagon.state = 1
+                    if hexagon.state == 0:
+                        hexagon.state = 1
                 
 
         for hexagon in hexagons:
             hexagon.update()
 
         render(screen, hexagons)
-        clock.tick(50)
+        clock.tick(60)
     pygame.display.quit()
 
 
