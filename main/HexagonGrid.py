@@ -4,7 +4,7 @@ import math
 from dataclasses import dataclass
 from typing import List
 from typing import Tuple
-
+import random
 
 import pygame
 
@@ -19,41 +19,34 @@ class HexagonTile:
     # state: int
     highlight_offset: int = 3
     max_highlight_ticks: int = 15
+    state: int = 0
+    nextstate: int = 0
 
     def __post_init__(self):
         self.vertices = self.compute_vertices()
         self.highlight_tick = 0
-        self.state = 0
 
-    def update(self):
+    def change_state(self, hexlist):
+        neighbours_list = self.compute_neighbours(hexlist)
+        neighbour_state_counter = sum(1 for neighbour in neighbours_list if neighbour.state == 1)
 
-        highlight_tick = self.highlight_tick
+        #print(f"Pos: {self.position}, state: {self.state}, neighbours: {neighbour_state_counter}, nextstate: {self.nextstate}")
+        if self.state == 0 and neighbour_state_counter >= 2:
+            self.nextstate = 1
+            
 
-        # neighbours_list = self.compute_neighbours(hexlist)
-        # neighbour_state_counter = 0
-
-        # for neighbour in neighbours_list:
-        #     if neighbour.state == 1:
-        #         neighbour_state_counter += 1
-
-        # if self.state == 0 and neighbour_state_counter >= 2:
-        #     state = 1
-
-        if self.highlight_tick > 0:
-            self.highlight_tick -= 1
-
-        if self.state == 1:
-            self.colour = [120, 0, 0]
-
-        # return create_hexagon(self.position, self.radius,)
-    
-    # def update_grid(self,hexlist):
-    #     nexthexlist = hexlist
-
-    #     for hexagon in hexlist:
-    #         hexagon.update()
+        # if self.highlight_tick > 0:
+        #     self.highlight_tick -= 1
 
         
+    def update(self):
+        if self.state == 1:
+            self.colour = [120, 0, 0]
+        else:
+            self.state = self.nextstate
+            if self.state == 1:
+                self.colour = [120, 0, 0]
+            
 
     def compute_vertices(self) -> List[Tuple[float, float]]:
         """Returns a list of the hexagon's vertices as x, y tuples"""
