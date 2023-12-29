@@ -16,37 +16,47 @@ class HexagonTile:
     radius: float
     position: Tuple[float, float]
     colour: Tuple[int, ...]
-    # state: int
     highlight_offset: int = 3
     max_highlight_ticks: int = 15
     state: int = 0
     nextstate: int = 0
+    flamestate: int = 15 # podstan palacej sie komorki
 
     def __post_init__(self):
         self.vertices = self.compute_vertices()
         self.highlight_tick = 0
 
     def change_state(self, hexlist):
-        neighbours_list = self.compute_neighbours(hexlist)
-        neighbour_state_counter = sum(1 for neighbour in neighbours_list if neighbour.state == 1)
-
-        #print(f"Pos: {self.position}, state: {self.state}, neighbours: {neighbour_state_counter}, nextstate: {self.nextstate}")
-        if self.state == 0 and neighbour_state_counter >= 2:
-            self.nextstate = 1
+        """Calculates whether the state of the cell should change in the next iteration. If yes, changes the nextstate value."""
+        if self.state == 0:
+            neighbours_list = self.compute_neighbours(hexlist)
+            neighbour_state_counter = sum(1 for neighbour in neighbours_list if neighbour.state == 1)
+            if neighbour_state_counter >= 2:
+                self.nextstate = 1
+        if self.state == 1:
+            self.flamestate -= 1
+            if self.flamestate == 0:
+                self.nextstate = 2
+            #TODO Change the implementation of the fire extinguishing? Not sure if this is the right approach, considering we want to add outside factors such as wind  
+            #TODO Add a different state for eg. walls and other materials, some of which may be unflammable, others more flammable eg. grass/bushes
+            #TODO add randomizing the possibility of the cell to catch fire, instead of being 100% when at least 2 neighbours are on fire
             
-
-        # if self.highlight_tick > 0:
-        #     self.highlight_tick -= 1
+        if self.highlight_tick > 0:
+            self.highlight_tick -= 1
 
         
     def update(self):
-        if self.state == 1:
-            self.colour = [120, 0, 0]
-        else:
+        """Updates the Cell's state based on it's current nextstate value."""
+        if self.nextstate > self.state:
             self.state = self.nextstate
-            if self.state == 1:
+            if self.state == 0:
+                self.colour = [0, 120, 0]
+            elif self.state == 1:
                 self.colour = [120, 0, 0]
-            
+            else:
+                self.colour = [100, 100, 100]
+        #TODO Maybe add other functionalities except change of color when changing the state
+
 
     def compute_vertices(self) -> List[Tuple[float, float]]:
         """Returns a list of the hexagon's vertices as x, y tuples"""
