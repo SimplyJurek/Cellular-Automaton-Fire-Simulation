@@ -9,7 +9,8 @@ from HexagonGrid import HexagonTile
 # pylint: disable=no-member
 
 hexradius = 20
-gridsize = 20
+gridsize = 63
+gridsize_2 = 31
 forestDensity = 80
 
 def create_hexagon(position, radius = hexradius, flat_top=False) -> HexagonTile:
@@ -58,7 +59,7 @@ def create_hexagon(position, radius = hexradius, flat_top=False) -> HexagonTile:
         cellResitance=tempResistance
         )
 
-def init_hexagons(num_x=gridsize, num_y=gridsize, flat_top=False) -> List[HexagonTile]:
+def init_hexagons(num_x=gridsize, num_y=gridsize_2, flat_top=False) -> List[HexagonTile]:
     """Creates a hexaogonal tile map of size num_x * num_y"""
     # pylint: disable=invalid-name
     leftmost_hexagon = create_hexagon(position=((hexradius/2), 0), flat_top=flat_top)
@@ -85,8 +86,11 @@ def init_hexagons(num_x=gridsize, num_y=gridsize, flat_top=False) -> List[Hexago
             hexagon = create_hexagon(position, flat_top=flat_top)
             hexagons.append(hexagon)
 
-    return hexagons
+    # create a list of neighbors at grid init to save CPU time
+    for hexagon in hexagons:
+        hexagon.compute_neighbours(hexagons)
 
+    return hexagons
 
 def render(screen, hexagons):
     """Renders hexagons on the screen"""
@@ -111,7 +115,6 @@ def update_grid(hexagons):
     """Updates the states of each cell in the grid."""
     for hexagon in hexagons:
         hexagon.update()
-
 
 def main():
     """Main function"""

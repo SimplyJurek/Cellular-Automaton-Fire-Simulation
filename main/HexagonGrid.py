@@ -20,6 +20,7 @@ class HexagonTile:
     max_highlight_ticks: int = 15
     state: int = 0
     nextstate: int = 0
+    neighbours_list: List = None
 
     cellHumidity: float = 0
     cellDensity: float = 0
@@ -35,8 +36,7 @@ class HexagonTile:
     def change_state(self, hexlist):
         """Calculates whether the state of the cell should change in the next iteration. If yes, changes the nextstate value."""
         if self.state == 0:
-            neighbours_list = self.compute_neighbours(hexlist)
-            neighbour_state_counter = sum(1 for neighbour in neighbours_list if neighbour.state == 2)
+            neighbour_state_counter = sum(1 for neighbour in self.neighbours_list if neighbour.state == 2)
             if neighbour_state_counter >= 2:
                 self.cellHumidity -= 1
                 cellResitance = (
@@ -91,8 +91,7 @@ class HexagonTile:
 
     def compute_neighbours(self, hexagons: List[HexagonTile]) -> List[HexagonTile]:
         """Returns hexagons whose centres are two minimal radiuses away from self.centre"""
-        # could cache results for performance
-        return [hexagon for hexagon in hexagons if self.is_neighbour(hexagon)]
+        self.neighbours_list = [hexagon for hexagon in hexagons if self.is_neighbour(hexagon)]
 
     def collide_with_point(self, point: Tuple[float, float]) -> bool:
         """Returns True if distance from centre to point is less than horizontal_length"""
