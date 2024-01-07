@@ -25,20 +25,6 @@ class HexagonTile:
     def __post_init__(self):
         self.vertices = self.compute_vertices()
         self.highlight_tick = 0
-        self.state = 0
-        self.health = 100
-
-    # def update(self):
-
-    #     # neighbours_list = self.compute_neighbours(hexagons_copy)
-    #     # neighbour_state_counter = 0
-
-    #     # for neighbour in neighbours_list:
-    #     #     if neighbour.state == 1:
-    #     #         neighbour_state_counter += 1
-
-    #     # if self.state == 0 and neighbour_state_counter >= 2:
-    #     #     self.state = 1
 
     def change_state(self, hexlist):
         """Calculates whether the state of the cell should change in the next iteration. If yes, changes the nextstate value."""
@@ -57,21 +43,6 @@ class HexagonTile:
             
         if self.highlight_tick > 0:
             self.highlight_tick -= 1
-
-        if self.state == 1 and self.health > 0:
-            self.colour = [120, 10, 0]
-            self.health -= 1
-        if self.state == 1 and self.health <= 0:
-            self.state = 2
-            self.colour = [60, 60, 60]
-
-        # return hexagons_copy
-    
-    # def update_grid(self,hexlist):
-    #     nexthexlist = hexlist
-
-    #     for hexagon in hexlist:
-    #         hexagon.update()
 
         
     def update(self):

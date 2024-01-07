@@ -1,3 +1,4 @@
+import random
 from typing import List
 
 import math
@@ -6,8 +7,8 @@ import pygame
 from FlatTopHexagonTile import FlatTopHexagonTile
 from HexagonTile import HexagonTile
 
-hexradius = 25
-gridsize = 10
+hexradius = 20
+gridsize = 20
 
 def create_hexagon(position, radius = hexradius, flat_top=False) -> HexagonTile:
     """Tworzy heksagon w wybranym punkcie"""
@@ -57,6 +58,16 @@ def render(screen, hexagons):
     for hexagon in colliding_hexagons:
         hexagon.render_highlight()
     pygame.display.flip()
+    
+def change_hexagon_states(hexagons):
+    """Performs change_state on all the cells in the grid."""
+    for hexagon in hexagons:
+        hexagon.change_state(hexagons)
+            
+def update_grid(hexagons):
+    """Updates the states of each cell in the grid."""
+    for hexagon in hexagons:
+        hexagon.update()
 
 
 def main():
@@ -70,6 +81,9 @@ def main():
     size_y = int(hexradius * math.cos(math.radians(30))*gridsize*2+hexradius * math.cos(math.radians(30)))
     screen = pygame.display.set_mode((size_x, size_y))
     terminated = False
+    pause = False
+    print("Simulation unpaused. Press Spacebar to pause.")
+    
     while not terminated:
         
         for event in pygame.event.get():
@@ -81,13 +95,22 @@ def main():
                     hexagon for hexagon in hexagons if hexagon.collide_with_point(mouse_pos)
                 ]
                 for hexagon in colliding_hexagons:
-                    if hexagon.state == 0:
-                        hexagon.state = 1
-                
-
-        for hexagon in hexagons:
-            hexagon.update()
-
+                    hexagon.state = 1
+                    hexagon.colour = [120, 0, 0]
+                    print(f"pos:{hexagon.position} state: {hexagon.state}, nextstate:{hexagon.nextstate}")
+            
+            if event.type == pygame.KEYDOWN:
+                if pygame.K_SPACE and pause == False: #Pause to put cells on fire, unpause to start propagating
+                    pause = True
+                    print("Simulation paused. Press Spacebar to unpause.")
+                elif pygame.K_SPACE and pause == True:
+                    pause = False
+                    print("Simulation unpaused. Press Spacebar to pause.")
+                    
+        if not pause:
+            change_hexagon_states(hexagons)        
+            update_grid(hexagons)
+            
         render(screen, hexagons)
         clock.tick(60)
     pygame.display.quit()
