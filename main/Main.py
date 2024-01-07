@@ -10,11 +10,53 @@ from HexagonGrid import HexagonTile
 
 hexradius = 20
 gridsize = 20
+forestDensity = 80
 
 def create_hexagon(position, radius = hexradius, flat_top=False) -> HexagonTile:
     """Creates a hexagon tile at the specified position"""
+    tempRange = random.randint(0, 100)
+    tempHumidity = random.randrange(0, 50, 1)
+    tempDensity = random.randrange(0, 100, 5)
+    tempDuff = random.randrange(0, 100, 5)
+
+    tempHealth = tempDensity + tempDuff
+    tempResistance = tempHumidity
+
+    if tempHealth * 4 > 256:
+        tempR = 256
+    else:
+        tempR = tempHealth * 4
+    if tempResistance * 4 > 256:
+        tempG = 256
+    else:
+        tempG = tempResistance * 4
+
+    if tempRange / forestDensity <= 1:
+        tempState = 0
+    elif tempRange / forestDensity > 1:
+        tempState = 1
+
+    if tempState == 0: # Las zdrowy
+        tempColour = (0, tempG, 0)
+    elif tempState == 1: # Lasu nie ma, woda jest
+        tempColour = (0, 0, 120)
+    elif tempState == 2: # Las sie pali
+        tempColour = (tempR, 0, 0)
+    elif tempState == 3: # Las sie wypalil
+        tempColour = (120, 120, 120)
+
     class_ = FlatTopHexagonTile if flat_top else HexagonTile
-    return class_(radius, position, colour=[0,153,0])
+    return class_(
+        radius, 
+        position,
+        cellHumidity=tempHumidity,
+        cellDensity=tempDensity,
+        cellDuff=tempDuff,
+        state=tempState,
+        colour=tempColour,
+        cellHealth=tempHealth,
+        cellResitance=tempResistance
+        )
 
 def init_hexagons(num_x=gridsize, num_y=gridsize, flat_top=False) -> List[HexagonTile]:
     """Creates a hexaogonal tile map of size num_x * num_y"""
@@ -50,7 +92,7 @@ def render(screen, hexagons):
     """Renders hexagons on the screen"""
     screen.fill((0, 0, 0))
     for hexagon in hexagons:
-        hexagon.render(screen)
+        hexagon.render(screen)  
 
     mouse_pos = pygame.mouse.get_pos()
     colliding_hexagons = [
@@ -78,7 +120,7 @@ def main():
     clock = pygame.time.Clock()
     hexagons = init_hexagons(flat_top=True)
     terminated = False
-    pause = False
+    pause = True
     print("Simulation unpaused. Press Spacebar to pause.")
     
     while not terminated:
@@ -92,7 +134,7 @@ def main():
                     hexagon for hexagon in hexagons if hexagon.collide_with_point(mouse_pos)
                 ]
                 for hexagon in colliding_hexagons:
-                    hexagon.state = 1
+                    hexagon.state = 2
                     hexagon.colour = [120, 0, 0]
                     print(f"pos:{hexagon.position} state: {hexagon.state}, nextstate:{hexagon.nextstate}")
             
@@ -107,8 +149,9 @@ def main():
         if not pause:
             change_hexagon_states(hexagons)        
             update_grid(hexagons)
-            
+          
         render(screen, hexagons)
+        
         clock.tick(60)
     pygame.display.quit()
 

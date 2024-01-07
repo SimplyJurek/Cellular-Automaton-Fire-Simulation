@@ -15,12 +15,18 @@ class HexagonTile:
 
     radius: float
     position: Tuple[float, float]
-    colour: Tuple[int, ...]
+    colour: Tuple[int, ...] = (0, 120, 0)
     highlight_offset: int = 3
     max_highlight_ticks: int = 15
     state: int = 0
     nextstate: int = 0
-    flamestate: int = 15 # podstan palacej sie komorki
+
+    cellHumidity: float = 0
+    cellDensity: float = 0
+    cellDuff: float = 0 
+
+    cellHealth: float = 0
+    cellResitance: float = 0
 
     def __post_init__(self):
         self.vertices = self.compute_vertices()
@@ -30,13 +36,23 @@ class HexagonTile:
         """Calculates whether the state of the cell should change in the next iteration. If yes, changes the nextstate value."""
         if self.state == 0:
             neighbours_list = self.compute_neighbours(hexlist)
-            neighbour_state_counter = sum(1 for neighbour in neighbours_list if neighbour.state == 1)
+            neighbour_state_counter = sum(1 for neighbour in neighbours_list if neighbour.state == 2)
             if neighbour_state_counter >= 2:
-                self.nextstate = 1
-        if self.state == 1:
-            self.flamestate -= 1
-            if self.flamestate == 0:
-                self.nextstate = 2
+                self.cellHumidity -= 1
+                cellResitance = (
+                    self.cellHumidity
+                    )
+                if cellResitance == 0:
+                    self.nextstate = 2
+        if self.state == 2:
+            self.cellDensity -= 0.25
+            self.cellDuff -= 1
+            cellHealth = (
+                self.cellDensity + 
+                self.cellDuff
+                )
+            if cellHealth <= 0:
+                self.nextstate = 3
             #TODO Change the implementation of the fire extinguishing? Not sure if this is the right approach, considering we want to add outside factors such as wind  
             #TODO Add a different state for eg. walls and other materials, some of which may be unflammable, others more flammable eg. grass/bushes
             #TODO add randomizing the possibility of the cell to catch fire, instead of being 100% when at least 2 neighbours are on fire
@@ -51,7 +67,7 @@ class HexagonTile:
             self.state = self.nextstate
             if self.state == 0:
                 self.colour = [0, 120, 0]
-            elif self.state == 1:
+            elif self.state == 2:
                 self.colour = [120, 0, 0]
             else:
                 self.colour = [100, 100, 100]
@@ -91,7 +107,7 @@ class HexagonTile:
 
     def render(self, screen) -> None:
         """Renders the hexagon on the screen"""
-        pygame.draw.polygon(screen, self.highlight_colour, self.vertices)
+        pygame.draw.polygon(screen, self.colour, self.vertices)
         pygame.draw.aalines(screen, color = [0, 0, 0], closed=True, points=self.vertices)
        
 
