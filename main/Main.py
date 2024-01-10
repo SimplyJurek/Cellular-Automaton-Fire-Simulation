@@ -74,12 +74,10 @@ def init_hexagons(num_x=grid_width, num_y=grid_height, flat_top=False) -> List[H
     hexagons = [leftmost_hexagon]
     for x in range(num_y):
         if x:
-
             index = 2 if x % 2 == 1 or flat_top else 4
             position = leftmost_hexagon.vertices[index]
             leftmost_hexagon = create_hexagon(position, flat_top=flat_top)
             hexagons.append(leftmost_hexagon)
-
 
         hexagon = leftmost_hexagon
         for i in range(num_x):
@@ -216,7 +214,7 @@ def automata_main(screen, clock):
         if not pause:
             change_hexagon_states(hexagons)        
             update_grid(hexagons)
-          
+        
         render(screen, hexagons)
         
         clock.tick(FPS)
