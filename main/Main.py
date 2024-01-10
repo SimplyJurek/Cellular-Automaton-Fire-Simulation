@@ -1,3 +1,4 @@
+# * IMPORTS
 import random
 import pygame
 from typing import List
@@ -6,23 +7,30 @@ from HexagonGrid import FlatTopHexagonTile
 from HexagonGrid import HexagonTile
 from Button import Button
 
-SCREEN_WIDTH = 1920
+# * CONSTANT VALUES
+SCREEN_WIDTH = 1920 
 SCREEN_HEIGHT = 1080
 FPS = 60
+TEXT_COLOUR = (255, 255, 255)   # Text colour for ALL text displayed
+TEXT_COLOUR_HIGHLIGHT = (0, 0, 0)
+BUTTON_COLOUR = (255, 255, 255) # Button colour for ALL buttons displayed
+BUTTON_COLOUR_HIGHLIGHT = (255, 255, 255)
+BACKGROUND_COLOUR = (50, 50, 50)
+HEX_RADIUS = 20
+GRID_WIDTH = 25
+GRID_HEIGHT = 25
 
-hex_radius = 20
-grid_width = 25
-grid_height = 25
-
-TEXT_COLOUR = (255, 255, 255)
-BUTTON_COLOUR = (255, 255, 255)
-
-forest_density = 100
-
+# * GLOBAL VALUES
+forest_density = 100 # Forest density is show in precentage
 font = pygame.font.SysFont('arialblack', 48)
 
-def create_hexagon(position, radius = hex_radius, flat_top=False) -> HexagonTile:
-    """Creates a hexagon tile at the specified position"""
+# * Pygame initialization
+pygame.init()
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+clock = pygame.time.Clock()
+
+# * Creates a hexagon tile at the specified position
+def create_hexagon(position, radius = HEX_RADIUS, flat_top=False) -> HexagonTile:
     tempRange = random.randint(0, 100)
     tempHumidity = random.randrange(0, 50, 1)
     tempDensity = random.randrange(0, 150, 5)
@@ -67,10 +75,10 @@ def create_hexagon(position, radius = hex_radius, flat_top=False) -> HexagonTile
         cellResitance=tempResistance
         )
 
-def init_hexagons(num_x=grid_width, num_y=grid_height, flat_top=False) -> List[HexagonTile]:
-    """Creates a hexaogonal tile map of size num_x * num_y"""
-    global hex_radius, grid_height, grid_width
-    leftmost_hexagon = create_hexagon(position=((SCREEN_WIDTH/2) - ((grid_width / 4) * (hex_radius * 2) + (grid_width / 4) * hex_radius), 0), flat_top=flat_top)
+# * Creates a hexaogonal tile map of GRID_WIDTH * GRID_HEIGHT
+def init_hexagons(num_x=GRID_WIDTH, num_y=GRID_HEIGHT, flat_top=False) -> List[HexagonTile]:
+    global HEX_RADIUS, GRID_HEIGHT, GRID_WIDTH
+    leftmost_hexagon = create_hexagon(position=((SCREEN_WIDTH/2) - ((GRID_WIDTH / 4) * (HEX_RADIUS * 2) + (GRID_WIDTH / 4) * HEX_RADIUS), 0), flat_top=flat_top)
     hexagons = [leftmost_hexagon]
     for x in range(num_y):
         if x:
@@ -97,77 +105,75 @@ def init_hexagons(num_x=grid_width, num_y=grid_height, flat_top=False) -> List[H
 
     return hexagons
 
+# * Renders hexagons on the screen
 def render(screen, hexagons):
-    """Renders hexagons on the screen"""
     for hexagon in hexagons:
         hexagon.render(screen)  
-
-    mouse_pos = pygame.mouse.get_pos()
-    colliding_hexagons = [
-        hexagon for hexagon in hexagons if hexagon.collide_with_point(mouse_pos)
-    ]
-    for hexagon in colliding_hexagons:
-        hexagon.render_highlight()
     pygame.display.flip()
-    
+# * Performs change_state on all the cells in the grid.
 def change_hexagon_states(hexagons):
-    """Performs change_state on all the cells in the grid."""
     for hexagon in hexagons:
         hexagon.change_state(hexagons)
-            
+
+# * Updates the states of each cell in the grid.
 def update_grid(hexagons):
-    """Updates the states of each cell in the grid."""
     for hexagon in hexagons:
         hexagon.update()
 
-def automata_main(screen, clock):
-    """Automata Function"""
+# * Main simulation function
+def automata_main():
+    
     hexagons = init_hexagons(flat_top=True)
     terminated = False
     pause = True
-    print("Simulation paused. Press Spacebar to unpause.")
-    
+    buttons = []
+    # Simulation loop    
     while not terminated:
-        screen.fill((50, 50, 50))
+        screen.fill(BACKGROUND_COLOUR)
+        # Simulation buttons
         startButton = Button(
             screen,
             'Start',
             36,
             TEXT_COLOUR,
+            TEXT_COLOUR_HIGHLIGHT,
             (SCREEN_WIDTH/2 - 375, SCREEN_HEIGHT - 125),
             (150, 75),
             BUTTON_COLOUR,
-            True
+            BUTTON_COLOUR_HIGHLIGHT,
         )
         pauseButton = Button(
             screen,
             'Pause',
             36,
             TEXT_COLOUR,
+            TEXT_COLOUR_HIGHLIGHT,
             (SCREEN_WIDTH/2 - 175, SCREEN_HEIGHT - 125),
             (150, 75),
             BUTTON_COLOUR,
-            True
+            BUTTON_COLOUR_HIGHLIGHT,
         )
         resetButton = Button(
             screen,
             'Reset',
             36,
             TEXT_COLOUR,
+            TEXT_COLOUR_HIGHLIGHT,
             (SCREEN_WIDTH/2 + 25, SCREEN_HEIGHT - 125),
             (150, 75),
             BUTTON_COLOUR,
-            True
+            BUTTON_COLOUR_HIGHLIGHT,
         )
         backButton = Button(
             screen,
             'Back',
             36,
             TEXT_COLOUR,
+            TEXT_COLOUR_HIGHLIGHT,
             (SCREEN_WIDTH/2 + 225, SCREEN_HEIGHT - 125),
             (150, 75),
             BUTTON_COLOUR,
-            True
+            BUTTON_COLOUR_HIGHLIGHT,
         )
         if pause:
             pauseText = font.render('Simulation Paused', True, TEXT_COLOUR)
@@ -175,11 +181,14 @@ def automata_main(screen, clock):
             pauseTextRect = pauseText.get_rect(center = pauseRect.center)
             screen.blit(pauseText, pauseTextRect)
         else: pass
-
+        # Event handler
         for event in pygame.event.get():
+            # Quit
             if event.type == pygame.QUIT:
                 terminated = True
-            if event.type == pygame.MOUSEBUTTONDOWN:
+            # On click
+            if event.type == pygame.MOUSEBUTTONUP:
+                # Left click
                 if event.button == 1:
                     mouse_pos = pygame.mouse.get_pos()
                     colliding_hexagons = [
@@ -188,7 +197,7 @@ def automata_main(screen, clock):
                     for hexagon in colliding_hexagons:
                         hexagon.state = 2
                         hexagon.colour = [120, 0, 0]                        
-
+                # Right click
                 if event.button == 3:
                     mouse_pos = pygame.mouse.get_pos()
                     colliding_hexagons = [
@@ -206,10 +215,11 @@ def automata_main(screen, clock):
                     if pause == False: pause = True
                     else: pass
                 
-                if resetButton.check_click(): automata_main(screen, clock)
+                if resetButton.check_click(): 
+                    automata_main()
 
-                if backButton.check_click(): main()
-                    
+                if backButton.check_click(): 
+                    main()
                     
         if not pause:
             change_hexagon_states(hexagons)        
@@ -220,73 +230,108 @@ def automata_main(screen, clock):
         clock.tick(FPS)
     pygame.display.quit()
 
-def options(screen, clock):
-    """Options Menu"""
+# * Options menu
+def options():
     global forest_density
-    global grid_height
-    global grid_width
-    global hex_radius
     terminated = False
+    highlighted_25 = False
+    highlighted_50 = False
+    highlighted_75 = False
+    highlighted_100 = False
+    # Options menu loop
     while not terminated:
-        screen.fill((50, 50, 50))
-        # --- Forest density options ---
+        screen.fill(BACKGROUND_COLOUR)
         forestDensityText = font.render('Forest Density', True, (255, 255, 255))
         forestDensityTextRect = forestDensityText.get_rect(center=(SCREEN_WIDTH/2, 100))
         screen.blit(forestDensityText, forestDensityTextRect)
+        if forest_density == 25:
+            highlighted_25 = True
+            highlighted_50 = False
+            highlighted_75 = False
+            highlighted_100 = False
+        elif forest_density == 50:
+            highlighted_25 = False
+            highlighted_50 = True
+            highlighted_75 = False
+            highlighted_100 = False
+        elif forest_density == 75:
+            highlighted_25 = False
+            highlighted_50 = False
+            highlighted_75 = True
+            highlighted_100 = False
+        elif forest_density == 100:
+            highlighted_25 = False
+            highlighted_50 = False
+            highlighted_75 = False
+            highlighted_100 = True
+        # Forest density buttons
         forestDensity_25 = Button(
             screen,
             '25%',
             25,
             TEXT_COLOUR,
+            TEXT_COLOUR_HIGHLIGHT,
             ((SCREEN_WIDTH / 2) - 400, 150),
             (150, 52),
             BUTTON_COLOUR,
-            True
+            BUTTON_COLOUR_HIGHLIGHT,
+            highlighted=highlighted_25
         )
         forestDensity_50 = Button(
             screen,
             '50%',
             25,
             TEXT_COLOUR,
+            TEXT_COLOUR_HIGHLIGHT,
             ((SCREEN_WIDTH / 2) - 175, 150),
             (150, 52),
             BUTTON_COLOUR,
-            True
+            BUTTON_COLOUR_HIGHLIGHT,
+            highlighted=highlighted_50
         )
         forestDensity_75 = Button(
             screen,
             '75%',
             25,
             TEXT_COLOUR,
+            TEXT_COLOUR_HIGHLIGHT,
             ((SCREEN_WIDTH / 2) + 25, 150),
             (150, 52),
             BUTTON_COLOUR,
-            True
+            BUTTON_COLOUR_HIGHLIGHT,
+            highlighted=highlighted_75
         )
         forestDensity_100 = Button(
             screen,
             '100%',
             25,
             TEXT_COLOUR,
+            TEXT_COLOUR_HIGHLIGHT,
             ((SCREEN_WIDTH / 2) + 250, 150),
             (150, 52),
             BUTTON_COLOUR,
-            True
+            BUTTON_COLOUR_HIGHLIGHT,
+            highlighted=highlighted_100
         )
-        # --- --- --- --- --- 
+        # Return to main menu button
         backButton = Button(
             screen,
             'Back',
             48,
             TEXT_COLOUR,
+            TEXT_COLOUR_HIGHLIGHT,
             ((SCREEN_WIDTH / 2) - 150, (SCREEN_HEIGHT - 300)),
             (300, 150),
             BUTTON_COLOUR,
+            BUTTON_COLOUR_HIGHLIGHT,
             True
         )
+        # Event Handler
         for event in pygame.event.get():
+            # Quit
             if event.type == pygame.QUIT:
                 terminated = True
+            # On click
             if event.type == pygame.MOUSEBUTTONUP:
                 if backButton.check_click(): 
                     main()
@@ -304,22 +349,23 @@ def options(screen, clock):
 
     pygame.display.quit()
 
+# * Main menu
 def main():
-    """Main Menu"""
-    pygame.init()
-    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-    clock = pygame.time.Clock()
     terminated = False
+    # Main menu loop
     while not terminated:
-        screen.fill((50, 50, 50))
+        screen.fill(BACKGROUND_COLOUR)  
+        # Main menu buttons
         startButton = Button(
             screen,
             'Start',
             48,
             TEXT_COLOUR,
+            TEXT_COLOUR_HIGHLIGHT,
             ((SCREEN_WIDTH / 2) - 150, 150),
             (300, 150),
             BUTTON_COLOUR,
+            BUTTON_COLOUR_HIGHLIGHT,
             True
         )
         optionsButton = Button(
@@ -327,9 +373,11 @@ def main():
             'Options',
             48,
             TEXT_COLOUR,
+            TEXT_COLOUR_HIGHLIGHT,
             ((SCREEN_WIDTH / 2) - 150, 330),
             (300, 150),
             BUTTON_COLOUR,
+            BUTTON_COLOUR_HIGHLIGHT,
             True
         )
         exitButton = Button(
@@ -337,19 +385,26 @@ def main():
             'Exit',
             48,
             TEXT_COLOUR,
+            TEXT_COLOUR_HIGHLIGHT,
             ((SCREEN_WIDTH / 2) - 150, 510),
             (300, 150),
             BUTTON_COLOUR,
+            BUTTON_COLOUR_HIGHLIGHT,
             True
         )
-       
+        # Event handler
         for event in pygame.event.get():
+            # Quit
             if event.type == pygame.QUIT:
                 terminated = True
+            # On click
             if event.type == pygame.MOUSEBUTTONUP:
-                if startButton.check_click(): automata_main(screen, clock)                   
-                if optionsButton.check_click(): options(screen, clock)   
-                if exitButton.check_click(): terminated = True   
+                if startButton.check_click(): 
+                    automata_main()
+                if optionsButton.check_click(): 
+                    options()
+                if exitButton.check_click(): 
+                    terminated = True   
 
         pygame.display.update()
         clock.tick(FPS)

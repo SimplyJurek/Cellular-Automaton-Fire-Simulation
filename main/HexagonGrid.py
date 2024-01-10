@@ -15,8 +15,6 @@ class HexagonTile:
     radius: float
     position: Tuple[float, float]
     colour: Tuple[int, ...] = (0, 120, 0)
-    highlight_offset: int = 3
-    max_highlight_ticks: int = 15
     state: int = 0
     nextstate: int = 0
     neighbours_list: List = None
@@ -28,7 +26,6 @@ class HexagonTile:
 
     def __post_init__(self):
         self.vertices = self.compute_vertices()
-        self.highlight_tick = 0
 
     def change_state(self, hexlist):
         """Calculates whether the state of the cell should change in the next iteration. If yes, changes the nextstate value."""
@@ -50,9 +47,6 @@ class HexagonTile:
                 )
             if cellHealth <= 0:
                 self.nextstate = 3
-            
-        if self.highlight_tick > 0:
-            self.highlight_tick -= 1
         
     def update(self):
         """Updates the Cell's state based on it's current nextstate value."""
@@ -98,11 +92,6 @@ class HexagonTile:
         """Renders the hexagon on the screen"""
         pygame.draw.polygon(screen, self.colour, self.vertices)
         pygame.draw.aalines(screen, color = [0, 0, 0], closed=True, points=self.vertices)
-       
-
-    def render_highlight(self) -> None:
-        """Draws a border around the hexagon with the specified colour"""
-        self.highlight_tick = self.max_highlight_ticks
 
     @property
     def centre(self) -> Tuple[float, float]:
@@ -114,13 +103,6 @@ class HexagonTile:
     def minimal_radius(self) -> float:
         """Horizontal length of the hexagon"""
         return self.radius * math.cos(math.radians(30))
-
-    @property
-    def highlight_colour(self) -> Tuple[int, ...]:
-        """Colour of the hexagon tile when rendering highlight"""
-        offset = self.highlight_offset * self.highlight_tick
-        brighten = lambda x, y: x + y if x + y < 255 else 255
-        return tuple(brighten(x, offset) for x in self.colour)
 
 
 class FlatTopHexagonTile(HexagonTile):
