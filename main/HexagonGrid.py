@@ -12,7 +12,6 @@ import pygame
 @dataclass
 class HexagonTile:
     """Hexagon class"""
-
     radius: float
     position: Tuple[float, float]
     colour: Tuple[int, ...] = (0, 120, 0)
@@ -21,11 +20,9 @@ class HexagonTile:
     state: int = 0
     nextstate: int = 0
     neighbours_list: List = None
-
     cellHumidity: float = 0
     cellDensity: float = 0
     cellDuff: float = 0 
-
     cellHealth: float = 0
     cellResitance: float = 0
 
@@ -42,7 +39,7 @@ class HexagonTile:
                 cellResitance = (
                     self.cellHumidity
                     )
-                if cellResitance == 0:
+                if cellResitance <= 0:
                     self.nextstate = 2
         if self.state == 2:
             self.cellDensity -= 0.25
@@ -53,13 +50,9 @@ class HexagonTile:
                 )
             if cellHealth <= 0:
                 self.nextstate = 3
-            #TODO Change the implementation of the fire extinguishing? Not sure if this is the right approach, considering we want to add outside factors such as wind  
-            #TODO Add a different state for eg. walls and other materials, some of which may be unflammable, others more flammable eg. grass/bushes
-            #TODO add randomizing the possibility of the cell to catch fire, instead of being 100% when at least 2 neighbours are on fire
             
         if self.highlight_tick > 0:
             self.highlight_tick -= 1
-
         
     def update(self):
         """Updates the Cell's state based on it's current nextstate value."""
@@ -71,12 +64,9 @@ class HexagonTile:
                 self.colour = [120, 0, 0]
             else:
                 self.colour = [100, 100, 100]
-        #TODO Maybe add other functionalities except change of color when changing the state
-
 
     def compute_vertices(self) -> List[Tuple[float, float]]:
         """Returns a list of the hexagon's vertices as x, y tuples"""
-        # pylint: disable=invalid-name
         x, y = self.position
         half_radius = self.radius / 2
         minimal_radius = self.minimal_radius
@@ -113,18 +103,16 @@ class HexagonTile:
     def render_highlight(self) -> None:
         """Draws a border around the hexagon with the specified colour"""
         self.highlight_tick = self.max_highlight_ticks
-        # pygame.draw.polygon(screen, self.highlight_colour, self.vertices)
 
     @property
     def centre(self) -> Tuple[float, float]:
         """Centre of the hexagon"""
-        x, y = self.position  # pylint: disable=invalid-name
+        x, y = self.position
         return (x, y + self.radius)
 
     @property
     def minimal_radius(self) -> float:
         """Horizontal length of the hexagon"""
-        # https://en.wikipedia.org/wiki/Hexagon#Parameters
         return self.radius * math.cos(math.radians(30))
 
     @property
@@ -138,7 +126,6 @@ class HexagonTile:
 class FlatTopHexagonTile(HexagonTile):
     def compute_vertices(self) -> List[Tuple[float, float]]:
         """Returns a list of the hexagon's vertices as x, y tuples"""
-        # pylint: disable=invalid-name
         x, y = self.position
         half_radius = self.radius / 2
         minimal_radius = self.minimal_radius
@@ -154,5 +141,5 @@ class FlatTopHexagonTile(HexagonTile):
     @property
     def centre(self) -> Tuple[float, float]:
         """Centre of the hexagon"""
-        x, y = self.position  # pylint: disable=invalid-name
+        x, y = self.position
         return (x + self.radius / 2, y + self.minimal_radius)
