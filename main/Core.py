@@ -7,7 +7,7 @@ from HexagonGrid import HexagonTile
 from typing import List
 
 # * Creates a hexagon tile at the specified position
-def create_hexagon(position, radius = G.HEX_RADIUS, flat_top=False) -> HexagonTile:
+def create_hexagon(position, radius = G.HEX_RADIUS) -> HexagonTile:
     tempRange = random.randint(0, 100)
     tempHumidity = random.randrange(0, 50, 1)
     tempDensity = random.randrange(0, 150, 5)
@@ -39,7 +39,7 @@ def create_hexagon(position, radius = G.HEX_RADIUS, flat_top=False) -> HexagonTi
     elif tempState == 3:
         tempColour = (120, 120, 120)
 
-    class_ = FlatTopHexagonTile if flat_top else HexagonTile
+    class_ = FlatTopHexagonTile if G.grid_orientation else HexagonTile
     return class_(
         radius, 
         position,
@@ -53,27 +53,27 @@ def create_hexagon(position, radius = G.HEX_RADIUS, flat_top=False) -> HexagonTi
         )
 
 # * Creates a hexaogonal tile map of GRID_WIDTH * GRID_HEIGHT
-def init_hexagons(num_x=G.GRID_WIDTH, num_y=G.GRID_HEIGHT, flat_top=False) -> List[HexagonTile]:
-    leftmost_hexagon = create_hexagon(position=((G.SCREEN_WIDTH/2) - ((G.GRID_WIDTH / 4) * (G.HEX_RADIUS * 2) + (G.GRID_WIDTH / 4) * G.HEX_RADIUS), 0), flat_top=flat_top)
+def init_hexagons(grid_size) -> List[HexagonTile]:
+    leftmost_hexagon = create_hexagon(position=((G.SCREEN_WIDTH/2) - ((grid_size[0] / 4) * (G.HEX_RADIUS * 2) + (grid_size[0] / 4) * G.HEX_RADIUS), 0))
     hexagons = [leftmost_hexagon]
-    for x in range(num_y):
+    for x in range(grid_size[1]):
         if x:
-            index = 2 if x % 2 == 1 or flat_top else 4
+            index = 2 if x % 2 == 1 or G.grid_orientation else 4
             position = leftmost_hexagon.vertices[index]
-            leftmost_hexagon = create_hexagon(position, flat_top=flat_top)
+            leftmost_hexagon = create_hexagon(position)
             hexagons.append(leftmost_hexagon)
 
         hexagon = leftmost_hexagon
-        for i in range(num_x):
+        for i in range(grid_size[0]):
             x, y = hexagon.position 
-            if flat_top:
+            if G.grid_orientation:
                 if i % 2 == 1:
                     position = (x + hexagon.radius * 3 / 2, y - hexagon.minimal_radius)
                 else:
                     position = (x + hexagon.radius * 3 / 2, y + hexagon.minimal_radius)
             else:
                 position = (x + hexagon.minimal_radius * 2, y)
-            hexagon = create_hexagon(position, flat_top=flat_top)
+            hexagon = create_hexagon(position)
             hexagons.append(hexagon)
 
     for hexagon in hexagons:
@@ -85,7 +85,7 @@ def init_hexagons(num_x=G.GRID_WIDTH, num_y=G.GRID_HEIGHT, flat_top=False) -> Li
 def render(screen, hexagons):
     for hexagon in hexagons:
         hexagon.render(screen)  
-    pygame.display.flip()
+
 # * Performs change_state on all the cells in the grid.
 def change_hexagon_states(hexagons):
     for hexagon in hexagons:

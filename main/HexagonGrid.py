@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from typing import List
 from typing import Tuple
 import random
+import Global as G
 
 import pygame
 
@@ -87,13 +88,16 @@ class HexagonTile:
         """
         distance = math.dist(hexagon.centre, self.centre)
         return math.isclose(distance, 2 * self.minimal_radius, rel_tol=0.05)
+    
+    def apply_camera_offset(self, vertices):
+        return [(x - G.camera_offset[0], y - G.camera_offset[1]) for x, y in vertices]
 
     def render(self, screen) -> None:
         """Renders the hexagon on the screen"""
-        pygame.draw.polygon(screen, self.colour, self.vertices)
-        pygame.draw.aalines(screen, color = [0, 0, 0], closed=True, points=self.vertices)
+        pygame.draw.polygon(screen, self.colour, self.apply_camera_offset(self.vertices))
+        pygame.draw.aalines(screen, color = [0, 0, 0], closed=True, points=self.apply_camera_offset(self.vertices))
 
-    @property
+    @property   
     def centre(self) -> Tuple[float, float]:
         """Centre of the hexagon"""
         x, y = self.position

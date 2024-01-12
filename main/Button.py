@@ -30,7 +30,7 @@ class Button:
             colour = G.BUTTON_COLOUR
         buttonRect = pygame.rect.Rect(self.position, self.size)
         buttonTextRect = buttonText.get_rect(center = buttonRect.center)
-        pygame.draw.rect(G.SCREEN, colour, buttonRect, 0, 15) #check what if 2 changed to 0
+        pygame.draw.rect(G.SCREEN, colour, buttonRect, 0, 15) 
         G.SCREEN.blit(buttonText, buttonTextRect)
 
     def check_click(self):
