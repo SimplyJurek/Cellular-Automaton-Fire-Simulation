@@ -80,7 +80,7 @@ class HexagonTile:
 
     def collide_with_point(self, point: Tuple[float, float]) -> bool:
         """Returns True if distance from centre to point is less than horizontal_length"""
-        return math.dist(point, self.centre) < self.minimal_radius
+        return math.dist(point, self.apply_camera_offset(self.centre)) < self.minimal_radius
 
     def is_neighbour(self, hexagon: HexagonTile) -> bool:
         """Returns True if hexagon centre is approximately
@@ -89,8 +89,12 @@ class HexagonTile:
         distance = math.dist(hexagon.centre, self.centre)
         return math.isclose(distance, 2 * self.minimal_radius, rel_tol=0.05)
     
-    def apply_camera_offset(self, vertices):
-        return [(x - G.camera_offset[0], y - G.camera_offset[1]) for x, y in vertices]
+    def apply_camera_offset(self, coords: Tuple) -> Tuple:
+        """applies camera shift to hexagon objects and their hitboxes"""
+        if len(coords) > 2:
+            return [(x + G.camera_offset[0], y + G.camera_offset[1]) for x, y in coords]
+        else:
+            return (coords[0] + G.camera_offset[0], coords[1] + G.camera_offset[1])
 
     def render(self, screen) -> None:
         """Renders the hexagon on the screen"""

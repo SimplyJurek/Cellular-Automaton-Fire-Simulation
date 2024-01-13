@@ -1,4 +1,5 @@
 import pygame
+import math
 
 # * CONSTANT VALUES
 SCREEN_WIDTH = 1920 
@@ -35,3 +36,9 @@ def gridSize():
             grid_width = 80
             grid_height = 50
     return (grid_width, grid_height)
+
+def hexRadius():
+    if grid_orientation:
+        return HEX_RADIUS
+    else:
+        return math.cos(math.radians(30)) * HEX_RADIUS

@@ -50,10 +50,10 @@ def options():
         G.SCREEN.blit(gridSizeText, gridSizeTextRect)
 
         # Grid size buttons
-        gridSize_small  = Button('Min',  ((G.SCREEN_WIDTH / 2) - 200, 300), [150, 52, 25])
-        gridSize_mid  = Button('Mid',  ((G.SCREEN_WIDTH / 2) + 34, 300), [150, 52, 25])
-        gridSize_big  = Button('Big',  ((G.SCREEN_WIDTH / 2) + 270,  300), [150, 52, 25])
-        gridSize_max = Button('Max', ((G.SCREEN_WIDTH / 2) + 500, 300), [150, 52, 25])
+        gridSize_small  = Button('Min',  ((G.SCREEN_WIDTH / 2) - 200, 275), [150, 52, 25])
+        gridSize_mid  = Button('Mid',  ((G.SCREEN_WIDTH / 2) + 34, 275), [150, 52, 25])
+        gridSize_big  = Button('Big',  ((G.SCREEN_WIDTH / 2) + 270,  275), [150, 52, 25])
+        gridSize_max = Button('Max', ((G.SCREEN_WIDTH / 2) + 500, 275), [150, 52, 25])
         
         gridSize_small.draw(G.grid_size == 'min')
         gridSize_mid.draw(G.grid_size   == 'mid')
@@ -68,6 +68,23 @@ def options():
             gridSize_big.draw(True)
         if gridSize_max.check_click(): 
             gridSize_max.draw(True)
+
+        # Grid orientation
+        gridSizeText = G.FONT.render('Grid orientation', True, (255, 255, 255))
+        gridSizeTextRect = gridSizeText.get_rect(center=(G.SCREEN_WIDTH/2 - 500, 425))
+        G.SCREEN.blit(gridSizeText, gridSizeTextRect)
+
+        # Grid size buttons
+        gridSize_flat  = Button('Flat top',  ((G.SCREEN_WIDTH / 2) - 200, 400), [380, 52, 25])
+        gridSize_point  = Button('Pointy top',  ((G.SCREEN_WIDTH / 2) + 270, 400), [380, 52, 25])
+        
+        gridSize_flat.draw(G.grid_orientation)
+        gridSize_point.draw(not G.grid_orientation)
+
+        if gridSize_flat.check_click(): 
+            gridSize_flat.draw(True)
+        if gridSize_point.check_click(): 
+            gridSize_point.draw(True)
 
         # Return to main menu button
         backButton = Button('Back', ((G.SCREEN_WIDTH / 2) - 150, (G.SCREEN_HEIGHT - 300)), [300, 150, 48])
@@ -101,6 +118,11 @@ def options():
                     G.grid_size = 'big'
                 if gridSize_max.check_click(): 
                     G.grid_size = 'max'
+
+                if gridSize_flat.check_click(): 
+                    G.grid_orientation = True
+                if gridSize_point.check_click(): 
+                    G.grid_orientation = False
 
                 if backButton.check_click(): 
                     main()
@@ -145,6 +167,10 @@ def automata_main():
                     for hexagon in colliding_hexagons:
                         hexagon.state = 2
                         hexagon.colour = [120, 0, 0]    
+                
+                # Middle click
+                if event.button == 2:
+                    mouse_dragging = False
 
                 # Right click
                 if event.button == 3:
@@ -167,12 +193,10 @@ def automata_main():
                 if backButton.check_click(): 
                     main()
 
-            # Middle mouse button
+            # camera handling
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 2:  
                 mouse_dragging = True
                 original_mouse_position = pygame.mouse.get_pos()
-            elif event.type == pygame.MOUSEBUTTONUP and event.button == 2:
-                mouse_dragging = False
 
         if mouse_dragging:
             current_mouse_position = pygame.mouse.get_pos()
@@ -236,7 +260,8 @@ def main():
                 terminated = True
             # On click
             if event.type == pygame.MOUSEBUTTONUP:
-                if startButton.check_click(): 
+                if startButton.check_click():
+                    G.camera_offset = [0, 0] # reset camera offset between simulations
                     automata_main()
                 if optionsButton.check_click(): 
                     options()

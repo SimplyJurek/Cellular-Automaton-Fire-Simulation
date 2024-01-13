@@ -54,7 +54,11 @@ def create_hexagon(position, radius = G.HEX_RADIUS) -> HexagonTile:
 
 # * Creates a hexaogonal tile map of GRID_WIDTH * GRID_HEIGHT
 def init_hexagons(grid_size) -> List[HexagonTile]:
-    leftmost_hexagon = create_hexagon(position=((G.SCREEN_WIDTH/2) - ((grid_size[0] / 4) * (G.HEX_RADIUS * 2) + (grid_size[0] / 4) * G.HEX_RADIUS), 0))
+    leftmost_hexagon = create_hexagon(position=(
+        (G.SCREEN_WIDTH / 2) - ((grid_size[0] / 4) * (G.hexRadius() * 2) + (grid_size[0] / 4) * G.hexRadius()),
+        (G.SCREEN_HEIGHT / 2) - ((grid_size[1] / 4) * (3 * G.hexRadius()) + (grid_size[1] / 4) * G.hexRadius())
+        # TODO still needs adjusting, for pointy top grid it doesnt start centered
+    ))
     hexagons = [leftmost_hexagon]
     for x in range(grid_size[1]):
         if x:
