@@ -92,9 +92,16 @@ class HexagonTile:
     def apply_camera_offset(self, coords: Tuple) -> Tuple:
         """applies camera shift to hexagon objects and their hitboxes"""
         if len(coords) > 2:
-            return [(x + G.camera_offset[0], y + G.camera_offset[1]) for x, y in coords]
+            return [
+                ((x - G.SCREEN_CENTER[0]) * G.zoom_factor + G.SCREEN_CENTER[0] + G.camera_offset[0],
+                (y - G.SCREEN_CENTER[1]) * G.zoom_factor + G.SCREEN_CENTER[1] + G.camera_offset[1])
+                for x, y in coords
+            ]
         else:
-            return (coords[0] + G.camera_offset[0], coords[1] + G.camera_offset[1])
+            return (
+                (coords[0] - G.SCREEN_CENTER[0]) * G.zoom_factor + G.SCREEN_CENTER[0] + G.camera_offset[0],
+                (coords[1] - G.SCREEN_CENTER[1]) * G.zoom_factor + G.SCREEN_CENTER[1] + G.camera_offset[1]
+            )
 
     def render(self, screen) -> None:
         """Renders the hexagon on the screen"""

@@ -59,6 +59,10 @@ def init_hexagons(grid_size) -> List[HexagonTile]:
         (G.SCREEN_HEIGHT / 2) - ((grid_size[1] / 4) * (3 * G.hexRadius()) + (grid_size[1] / 4) * G.hexRadius())
         # TODO still needs adjusting, for pointy top grid it doesnt start centered
     ))
+
+    total_cells = grid_size[0] * grid_size[1]
+    current_cells = 0
+
     hexagons = [leftmost_hexagon]
     for x in range(grid_size[1]):
         if x:
@@ -66,6 +70,9 @@ def init_hexagons(grid_size) -> List[HexagonTile]:
             position = leftmost_hexagon.vertices[index]
             leftmost_hexagon = create_hexagon(position)
             hexagons.append(leftmost_hexagon)
+            current_cells += 1
+            if current_cells <= total_cells and current_cells % G.batch_size == 0: 
+                update_loading_progress("Generated", (current_cells, total_cells))
 
         hexagon = leftmost_hexagon
         for i in range(grid_size[0]):
@@ -79,11 +86,37 @@ def init_hexagons(grid_size) -> List[HexagonTile]:
                 position = (x + hexagon.minimal_radius * 2, y)
             hexagon = create_hexagon(position)
             hexagons.append(hexagon)
-
+            current_cells += 1
+            if current_cells <= total_cells and current_cells % G.batch_size == 0: 
+                update_loading_progress("Generated", (current_cells, total_cells))
+        
+    current_cells = 0
     for hexagon in hexagons:
         hexagon.compute_neighbours(hexagons)
+        current_cells += 1
+        if current_cells <= total_cells and current_cells % G.batch_size == 0: 
+            update_loading_progress("Calculated neighbors for", (current_cells, total_cells))
 
     return hexagons
+
+def display_loading_screen():
+    G.SCREEN.fill(G.BACKGROUND_COLOUR)
+    font = pygame.font.SysFont(None, 36)
+    text = font.render('Generating Grid...', True, (255, 255, 255))
+    G.SCREEN.blit(text, (G.SCREEN_WIDTH // 2 - text.get_width() // 2, G.SCREEN_HEIGHT // 2 - text.get_height() // 2))
+    pygame.display.update()
+
+def update_loading_progress(message, progress):
+    G.SCREEN.fill(G.BACKGROUND_COLOUR)
+    font = pygame.font.SysFont(None, 36)
+    text = font.render(message + f' {progress[0]} of {progress[1]} cells...', True, (255, 255, 255))
+    G.SCREEN.blit(text, (G.SCREEN_WIDTH // 2 - text.get_width() // 2, G.SCREEN_HEIGHT // 2 - text.get_height() // 2))
+    pygame.display.update()
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            return
 
 # * Renders hexagons on the screen
 def render(screen, hexagons):

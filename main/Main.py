@@ -134,7 +134,7 @@ def options():
 
 # * Main simulation function
 def automata_main():
-    
+    C.display_loading_screen()
     hexagons = C.init_hexagons(G.gridSize())
     terminated = False
     pause = True
@@ -152,6 +152,7 @@ def automata_main():
 
         # Event handler
         for event in pygame.event.get():
+            mouse_pos = pygame.mouse.get_pos()
             # Quit
             if event.type == pygame.QUIT:
                 terminated = True
@@ -160,7 +161,6 @@ def automata_main():
 
                 # Left click
                 if event.button == 1:
-                    mouse_pos = pygame.mouse.get_pos()
                     colliding_hexagons = [
                         hexagon for hexagon in hexagons if hexagon.collide_with_point(mouse_pos)
                     ]
@@ -174,7 +174,6 @@ def automata_main():
 
                 # Right click
                 if event.button == 3:
-                    mouse_pos = pygame.mouse.get_pos()
                     colliding_hexagons = [
                         hexagon for hexagon in hexagons if hexagon.collide_with_point(mouse_pos)
                     ]
@@ -193,10 +192,22 @@ def automata_main():
                 if backButton.check_click(): 
                     main()
 
-            # camera handling
-            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 2:  
-                mouse_dragging = True
-                original_mouse_position = pygame.mouse.get_pos()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                # camera handling
+                if event.button == 2:  
+                    mouse_dragging = True
+                    original_mouse_position = pygame.mouse.get_pos()
+
+                # zoom handling
+                if event.button == 4:  # Scroll Up
+                    G.zoom_factor += G.ZOOM_DETENT * (1 + G.zoom_factor)**2
+                    if G.zoom_factor > G.MAX_ZOOM:
+                        G.zoom_factor = G.MAX_ZOOM
+
+                if event.button == 5:  # Scroll Down
+                    G.zoom_factor -= G.ZOOM_DETENT * (1 + G.zoom_factor)**2
+                    if G.zoom_factor < G.MIN_ZOOM:
+                        G.zoom_factor = G.MIN_ZOOM
 
         if mouse_dragging:
             current_mouse_position = pygame.mouse.get_pos()
@@ -261,7 +272,8 @@ def main():
             # On click
             if event.type == pygame.MOUSEBUTTONUP:
                 if startButton.check_click():
-                    G.camera_offset = [0, 0] # reset camera offset between simulations
+                    G.camera_offset = [0, 0] #      reset camera offset 
+                    G.zoom_factor = 1.0 #       and zoom between simulations
                     automata_main()
                 if optionsButton.check_click(): 
                     options()
