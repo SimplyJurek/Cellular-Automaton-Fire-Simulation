@@ -105,36 +105,37 @@ def options():
         else:
             wind_direction_left = Button('Left', ((G.SCREEN_WIDTH / 2) - 200, 495), [380, 52, 16])
             wind_direction_right = Button('Right', ((G.SCREEN_WIDTH / 2) + 270, 495), [380, 52, 16])
+        
+        if G.wind_strength != 0.0:
+            wind_direction_top_left.draw(G.wind_direction == 'bottom_right')
+            wind_direction_top_right.draw(G.wind_direction == 'bottom_left')
+            wind_direction_bottom_left.draw(G.wind_direction == 'top_right')
+            wind_direction_bottom_right.draw(G.wind_direction == 'top_left')
+            if G.grid_orientation:
+                wind_direction_top.draw(G.wind_direction == 'bottom')
+                wind_direction_bottom.draw(G.wind_direction == 'top')
+            else:
+                wind_direction_left.draw(G.wind_direction == 'right')
+                wind_direction_right.draw(G.wind_direction == 'left')
 
-        wind_direction_top_left.draw(G.wind_direction == 'bottom_right')
-        wind_direction_top_right.draw(G.wind_direction == 'bottom_left')
-        wind_direction_bottom_left.draw(G.wind_direction == 'top_right')
-        wind_direction_bottom_right.draw(G.wind_direction == 'top_left')
-        if G.grid_orientation:
-            wind_direction_top.draw(G.wind_direction == 'bottom')
-            wind_direction_bottom.draw(G.wind_direction == 'top')
-        else:
-            wind_direction_left.draw(G.wind_direction == 'right')
-            wind_direction_right.draw(G.wind_direction == 'left')
-
-        if wind_direction_top_left.check_click():
-            wind_direction_top_left.draw(True)
-        if wind_direction_top_right.check_click():
-            wind_direction_top_right.draw(True)
-        if wind_direction_bottom_left.check_click():
-            wind_direction_bottom_left.draw(True)
-        if wind_direction_bottom_right.check_click():
-            wind_direction_bottom_right.draw(True)
-        if G.grid_orientation:
-            if wind_direction_top.check_click():
-                wind_direction_top.draw(True)
-            if wind_direction_bottom.check_click():
-                wind_direction_bottom.draw(True)
-        else:
-            if wind_direction_left.check_click():
-                wind_direction_left.draw(True)
-            if wind_direction_right.check_click():
-                wind_direction_right.draw(True)
+            if wind_direction_top_left.check_click():
+                wind_direction_top_left.draw(True)
+            if wind_direction_top_right.check_click():
+                wind_direction_top_right.draw(True)
+            if wind_direction_bottom_left.check_click():
+                wind_direction_bottom_left.draw(True)
+            if wind_direction_bottom_right.check_click():
+                wind_direction_bottom_right.draw(True)
+            if G.grid_orientation:
+                if wind_direction_top.check_click():
+                    wind_direction_top.draw(True)
+                if wind_direction_bottom.check_click():
+                    wind_direction_bottom.draw(True)
+            else:
+                if wind_direction_left.check_click():
+                    wind_direction_left.draw(True)
+                if wind_direction_right.check_click():
+                    wind_direction_right.draw(True)
             
         # Wind strength
         windStrengthText = G.FONT.render('Wind Strength', True, (255, 255, 255))
