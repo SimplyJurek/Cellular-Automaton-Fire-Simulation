@@ -344,7 +344,7 @@ def automata_main():
     buttons = []
     # Simulation loop    
     while not terminated:
-        clock.update()
+        
         G.SCREEN.fill(G.BACKGROUND_COLOUR)
         # Simulation buttons
         startButton = Button('Start', (G.SCREEN_WIDTH/2 - 375, G.SCREEN_HEIGHT - 125), [150, 75, 36])
@@ -424,8 +424,12 @@ def automata_main():
             original_mouse_position = current_mouse_position       
 
         if not pause:
+            clock.resume()
+            clock.update()
             C.change_hexagon_states(hexagons)        
             C.update_grid(hexagons)
+        else:
+            clock.pause()
         
         C.render(G.SCREEN, hexagons)
 
