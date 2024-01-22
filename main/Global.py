@@ -4,7 +4,7 @@ import math
 # * CONSTANT VALUES
 SCREEN_WIDTH = 1920 
 SCREEN_HEIGHT = 1080
-FPS = 60
+FPS = 30
 TEXT_COLOUR = (255, 255, 255)   # Text colour for ALL text displayed
 TEXT_COLOUR_HIGHLIGHT = (0, 0, 0)
 BUTTON_COLOUR = (100, 100, 100) # Button colour for ALL buttons displayed
@@ -13,7 +13,7 @@ BACKGROUND_COLOUR = (50, 50, 50)
 HEX_RADIUS = 20
 CLOCK = pygame.time.Clock()
 SCREEN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-FONT = pygame.font.SysFont('arialblack', 48)
+FONT = pygame.font.SysFont('arialblack', 24)
 ZOOM_DETENT = 0.05
 MIN_ZOOM = 0.1
 MAX_ZOOM = 2.0
@@ -24,6 +24,9 @@ WIND_ARROW_COLOR = (255, 255, 255)
 
 # * GLOBAL VALUES
 forest_density = 100 # Forest density is show in precentage
+cell_humidity = [0, 30, 5]
+cell_density = [25, 75, 5]
+cell_duff = [25, 75, 5]
 grid_orientation = True # True is flat top 
 grid_size = 'mid'
 camera_offset = [0, 0]

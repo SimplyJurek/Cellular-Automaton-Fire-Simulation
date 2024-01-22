@@ -12,9 +12,9 @@ import math
 # * Creates a hexagon tile at the specified position
 def create_hexagon(position, radius = G.HEX_RADIUS) -> HexagonTile:
     tempRange = random.randint(0, 100)
-    tempHumidity = random.randrange(0, 50, 1)
-    tempDensity = random.randrange(0, 150, 5)
-    tempDuff = random.randrange(0, 150, 5)
+    tempHumidity = random.randrange(G.cell_humidity[0], G.cell_humidity[1], G.cell_humidity[2])
+    tempDensity = random.randrange(G.cell_density[0], G.cell_density[1], G.cell_density[2])
+    tempDuff = random.randrange(G.cell_duff[0], G.cell_duff[1], G.cell_duff[2])
 
     tempHealth = tempDensity + tempDuff
     tempResistance = tempHumidity
@@ -162,7 +162,6 @@ def calculate_wind_direction_vector(wind_direction: str, length: float) -> Tuple
 # Draw the wind direction arrow
 def draw_wind_triangle(surface, wind_direction, length, position):
     wind_direction_vector = calculate_wind_direction_vector(wind_direction, length)
-    position = (position[0] - G.camera_offset[0], position[1] - G.camera_offset[1])  # Adjust position based on camera offset
 
     # Draw an isosceles triangle
     base = Vector2(position)
