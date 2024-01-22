@@ -5,6 +5,9 @@ import Button
 from HexagonGrid import FlatTopHexagonTile
 from HexagonGrid import HexagonTile
 from typing import List
+from pygame.math import Vector2
+from typing import Tuple
+import math
 
 # * Creates a hexagon tile at the specified position
 def create_hexagon(position, radius = G.HEX_RADIUS) -> HexagonTile:
@@ -49,7 +52,7 @@ def create_hexagon(position, radius = G.HEX_RADIUS) -> HexagonTile:
         state=tempState,
         colour=tempColour,
         cellHealth=tempHealth,
-        cellResitance=tempResistance
+        cellResistance=tempResistance
         )
 
 # * Creates a hexaogonal tile map of GRID_WIDTH * GRID_HEIGHT
@@ -132,4 +135,48 @@ def change_hexagon_states(hexagons):
 def update_grid(hexagons):
     for hexagon in hexagons:
         hexagon.update()
+        
+# Calculate the wind direction vector based on global wind direction
+def calculate_wind_direction_vector(wind_direction: str, length: float) -> Tuple[float, float]:
+    # You need to implement the logic to convert wind direction to a vector
+    # For simplicity, assuming 6 equally spaced directions (hexagonal grid)
+    directions = [
+        (0, 1),   # Top
+        (-0.5, 0.5),  # Bottom-Right
+        (-0.5, -0.5),  # Bottom-Left
+        (0, -1),  # Bottom
+        (0.5, -0.5),  # Top-Left
+        (0.5, 0.5),   # Top-Right
+        (1, 0), # Right
+        (-1, 0) # Left
+    ]
+    index = ['right', 'bottom_right', 'bottom_left', 'left', 'top_left', 'top_right', 'top', 'bottom'].index(wind_direction)
+    direction = directions[index]
+
+    # Normalize the vector and multiply by the desired length
+    magnitude = math.sqrt(direction[0]**2 + direction[1]**2)
+    normalized_vector = Vector2(direction[0] / magnitude, direction[1] / magnitude)
+
+    return Vector2(normalized_vector.x * length, normalized_vector.y * length)
+
+# Draw the wind direction arrow
+def draw_wind_triangle(surface, wind_direction, length, position):
+    wind_direction_vector = calculate_wind_direction_vector(wind_direction, length)
+    position = (position[0] - G.camera_offset[0], position[1] - G.camera_offset[1])  # Adjust position based on camera offset
+
+    # Draw an isosceles triangle
+    base = Vector2(position)
+    apex = base + wind_direction_vector.rotate(90)  # Rotate the base vector to get the apex
+    wing1 = base + wind_direction_vector
+    wing2 = base - wind_direction_vector
+
+    pygame.draw.polygon(surface, (200, 200, 200), [apex, wing1, wing2])
+    
+    # Render the text
+    font = pygame.font.Font(None, 36)
+    text_surface = font.render("Wind direction", True, (255, 255, 255))
+    text_rect = text_surface.get_rect(center=(position[0], position[1] - 60))  # Adjust the position above the triangle
+    surface.blit(text_surface, text_rect)
+
+
 

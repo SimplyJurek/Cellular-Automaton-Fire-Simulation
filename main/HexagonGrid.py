@@ -18,12 +18,12 @@ class HexagonTile:
     colour: Tuple[int, ...] = (0, 120, 0)
     state: int = 0
     nextstate: int = 0
-    neighbours_list: List = None
+    neighbours_dict: dict = None
     cellHumidity: float = 0
     cellDensity: float = 0
     cellDuff: float = 0 
     cellHealth: float = 0
-    cellResitance: float = 0
+    cellResistance: float = 0
 
     def __post_init__(self):
         self.vertices = self.compute_vertices()
@@ -31,13 +31,17 @@ class HexagonTile:
     def change_state(self, hexlist):
         """Calculates whether the state of the cell should change in the next iteration. If yes, changes the nextstate value."""
         if self.state == 0:
-            neighbour_state_counter = sum(1 for neighbour in self.neighbours_list if neighbour.state == 2)
+            neighbour_state_counter = sum(1 for neighbour in self.neighbours_dict.values() if neighbour is not None and neighbour.state == 2)
+            wind_blowing_towards_me = self.is_neighbourXwind_on_fire()
             if neighbour_state_counter >= 2:
-                self.cellHumidity -= 1
-                cellResitance = (
+                if wind_blowing_towards_me:
+                    self.cellHumidity -= 1 * G.wind_strength
+                else:
+                    self.cellHumidity -= 1
+                cellResistance = (
                     self.cellHumidity
                     )
-                if cellResitance <= 0:
+                if cellResistance <= 0:
                     self.nextstate = 2
         if self.state == 2:
             self.cellDensity -= 0.25
@@ -73,10 +77,96 @@ class HexagonTile:
             (x + minimal_radius, y + 3 * half_radius),
             (x + minimal_radius, y + half_radius),
         ]
+        
+    def is_neighbourXwind_on_fire(self):
+        """
+        Checks if the neighbour which is on fire is on the same side that the wind is blowing from.
+        """
+        if G.wind_strength != 0.0:
+            # Adjust the cell resistance based on wind influence
+            wind_directions_on_fire = [position for position, neighbour in self.neighbours_dict.items() if neighbour is not None and neighbour.state == 2]
+            # If the wind direction matches any neighbouring cell on fire, return True
+            if G.wind_direction in wind_directions_on_fire:
+                return True
+        return False
 
-    def compute_neighbours(self, hexagons: List[HexagonTile]) -> List[HexagonTile]:
-        """Returns hexagons whose centres are two minimal radiuses away from self.centre"""
-        self.neighbours_list = [hexagon for hexagon in hexagons if self.is_neighbour(hexagon)]
+        return 0.0  # No wind influence in this case
+        
+    def relative_position_flat_top(self, other_hexagon: HexagonTile) -> str:
+        """
+        Returns the relative position of the given hexagon with respect to the current flat-top hexagon.
+        Possible values: 'top_left', 'bottom_left', 'top_right', 'bottom_right', 'top', 'bottom'
+        """
+        x1, y1 = self.position
+        x2, y2 = other_hexagon.position
+
+        if x2 < x1 - self.radius:
+            if y2 < y1:
+                return 'top_left'
+            elif y2 > y1:
+                return 'bottom_left'
+        elif x2 > x1 + self.radius:
+            if y2 < y1:
+                return 'top_right'
+            elif y2 > y1:
+                return 'bottom_right'
+        else:
+            if y2 < y1:
+                return 'top'
+            elif y2 > y1:
+                return 'bottom'
+
+        # If the hexagons are at the same position
+        return 'same_position'
+    
+    def relative_position_pointy_top(self, other_hexagon: HexagonTile) -> str:
+        """
+        Returns the relative position of the given hexagon with respect to the current pointy-top hexagon.
+        Possible values: 'top_left', 'top_right', 'left', 'right', 'bottom_left', 'bottom_right'
+        """
+        x1, y1 = self.position
+        x2, y2 = other_hexagon.position
+
+        if y2 < y1 - self.radius:
+            if x2 < x1:
+                return 'top_left'
+            elif x2 > x1:
+                return 'top_right'
+        elif y2 > y1 + self.radius:
+            if x2 < x1:
+                return 'bottom_left'
+            elif x2 > x1:
+                return 'bottom_right'
+        else:
+            if x2 < x1:
+                return 'left'
+            elif x2 > x1:
+                return 'right'
+
+        # If the hexagons are at the same position
+        return 'same_position'
+
+
+    def compute_neighbours(self, hexagons: List[HexagonTile]) -> None:
+        """Fills the neighbours_dict with valid neighbors."""
+        if G.grid_orientation:
+            keys = ['top_left', 'top_right', 'top', 'bottom', 'bottom_left', 'bottom_right']
+        else:
+            keys = ['top_left', 'top_right', 'left', 'right', 'bottom_left', 'bottom_right']
+
+        self.neighbours_dict = {key: None for key in keys}
+
+        for hexagon in hexagons:
+            if self.is_neighbour(hexagon):
+                if G.grid_orientation:
+                    relative_position = self.relative_position_flat_top(hexagon)
+                else:
+                    relative_position = self.relative_position_pointy_top(hexagon)
+
+                self.neighbours_dict[relative_position] = hexagon
+        
+
+        
 
     def collide_with_point(self, point: Tuple[float, float]) -> bool:
         """Returns True if distance from centre to point is less than horizontal_length"""

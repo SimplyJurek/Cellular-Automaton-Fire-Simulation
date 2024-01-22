@@ -85,6 +85,58 @@ def options():
             gridSize_flat.draw(True)
         if gridSize_point.check_click(): 
             gridSize_point.draw(True)
+            
+        print(f"wind direction: {G.wind_direction}, wind strength: {G.wind_strength}")
+            
+        # Wind direction
+        if G.wind_strength != 0.0:     
+            windDirectionText = G.FONT.render('Wind Direction', True, (255, 255, 255))
+            windDirectionTextRect = windDirectionText.get_rect(center=(G.SCREEN_WIDTH/2 - 500, 525))
+            G.SCREEN.blit(windDirectionText, windDirectionTextRect)
+       
+
+        # Wind direction buttons
+        wind_direction_top_left = Button('Top Left', ((G.SCREEN_WIDTH / 2) - 200, 500), [380, 52, 25])
+        wind_direction_top_right = Button('Top Right', ((G.SCREEN_WIDTH / 2) + 270, 500), [380, 52, 25])
+        wind_direction_bottom_left = Button('Bottom Left', ((G.SCREEN_WIDTH / 2) - 200, 555), [380, 52, 25])
+        wind_direction_bottom_right = Button('Bottom Right', ((G.SCREEN_WIDTH / 2) + 270, 555), [380, 52, 25])
+        if G.grid_orientation:
+            wind_direction_top = Button('Top', ((G.SCREEN_WIDTH / 2) - 200, 610), [380, 52, 25])
+            wind_direction_bottom = Button('Bottom', ((G.SCREEN_WIDTH / 2) + 270, 610), [380, 52, 25])
+        else:
+            wind_direction_left = Button('Left', ((G.SCREEN_WIDTH / 2) - 200, 610), [380, 52, 25])
+            wind_direction_right = Button('Right', ((G.SCREEN_WIDTH / 2) + 270, 610), [380, 52, 25])
+
+        if G.wind_strength != 0.0:
+            wind_direction_top_left.draw(G.wind_direction == 'bottom_right')
+            wind_direction_top_right.draw(G.wind_direction == 'bottom_left')
+            wind_direction_bottom_left.draw(G.wind_direction == 'top_right')
+            wind_direction_bottom_right.draw(G.wind_direction == 'top_left')
+            if G.grid_orientation:
+                wind_direction_top.draw(G.wind_direction == 'bottom')
+                wind_direction_bottom.draw(G.wind_direction == 'top')
+            else:
+                wind_direction_left.draw(G.wind_direction == 'right')
+                wind_direction_right.draw(G.wind_direction == 'left')
+            
+        # Wind strength
+        windStrengthText = G.FONT.render('Wind Strength', True, (255, 255, 255))
+        windStrengthTextRect = windStrengthText.get_rect(center=(G.SCREEN_WIDTH/2 - 500, 700))
+        G.SCREEN.blit(windStrengthText, windStrengthTextRect)
+
+        # Wind strength buttons
+        wind_strength_weak = Button('Weak', ((G.SCREEN_WIDTH / 2) - 200, 675), [150, 52, 25])
+        wind_strength_moderate = Button('Moderate', ((G.SCREEN_WIDTH / 2) +34, 675), [150, 52, 25])
+        wind_strength_strong = Button('Strong', ((G.SCREEN_WIDTH / 2) + 270, 675), [150, 52, 25])
+        wind_strength_none = Button('None', ((G.SCREEN_WIDTH / 2) + 500, 675), [150, 52, 25])
+
+
+        wind_strength_weak.draw(G.wind_strength == 1.5)
+        wind_strength_moderate.draw(G.wind_strength == 2.3)
+        wind_strength_strong.draw(G.wind_strength == 3.0)
+        wind_strength_none.draw(G.wind_strength == 0.0)
+
+        
 
         # Return to main menu button
         backButton = Button('Back', ((G.SCREEN_WIDTH / 2) - 150, (G.SCREEN_HEIGHT - 300)), [300, 150, 48])
@@ -118,11 +170,39 @@ def options():
                     G.grid_size = 'big'
                 if gridSize_max.check_click(): 
                     G.grid_size = 'max'
+                    
+                if wind_direction_top_left.check_click():
+                    G.wind_direction = 'bottom_right'
+                if wind_direction_top_right.check_click():
+                    G.wind_direction = 'bottom_left'
+                if wind_direction_bottom_left.check_click():
+                    G.wind_direction = 'top_right'
+                if wind_direction_bottom_right.check_click():
+                    G.wind_direction = 'top_left'
+                if G.grid_orientation:
+                    if wind_direction_top.check_click():
+                        G.wind_direction = 'bottom'
+                    if wind_direction_bottom.check_click():
+                        G.wind_direction = 'top'
+                else:
+                    if wind_direction_left.check_click():
+                        G.wind_direction = 'right'
+                    if wind_direction_right.check_click():
+                        G.wind_direction = 'left'
 
                 if gridSize_flat.check_click(): 
                     G.grid_orientation = True
                 if gridSize_point.check_click(): 
                     G.grid_orientation = False
+                    
+                if wind_strength_weak.check_click():
+                    G.wind_strength = 1.5
+                if wind_strength_moderate.check_click():
+                    G.wind_strength = 2.3
+                if wind_strength_strong.check_click():
+                    G.wind_strength = 3
+                if wind_strength_none.check_click():
+                    G.wind_strength = 0.0
 
                 if backButton.check_click(): 
                     main()
@@ -149,6 +229,9 @@ def automata_main():
         pauseButton = Button('Pause', (G.SCREEN_WIDTH/2 - 175, G.SCREEN_HEIGHT - 125), [150, 75, 36])
         resetButton = Button('Reset', (G.SCREEN_WIDTH/2 + 25, G.SCREEN_HEIGHT - 125), [150, 75, 36])
         backButton = Button('Back', (G.SCREEN_WIDTH/2 + 225, G.SCREEN_HEIGHT - 125), [150, 75, 36])
+        if G.wind_strength != 0.0:
+            C.draw_wind_triangle(G.SCREEN, G.wind_direction, G.WIND_ARROW_LENGTH, (100, 100))
+
 
         # Event handler
         for event in pygame.event.get():

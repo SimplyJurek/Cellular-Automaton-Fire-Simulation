@@ -18,6 +18,9 @@ ZOOM_DETENT = 0.05
 MIN_ZOOM = 0.1
 MAX_ZOOM = 2.0
 SCREEN_CENTER = (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
+WIND_ARROW_WIDTH = 10
+WIND_ARROW_LENGTH = 50
+WIND_ARROW_COLOR = (255, 255, 255)
 
 # * GLOBAL VALUES
 forest_density = 100 # Forest density is show in precentage
@@ -26,6 +29,8 @@ grid_size = 'mid'
 camera_offset = [0, 0]
 zoom_factor = 1.0
 batch_size = 5
+wind_direction = 'bottom_right'  # Initial wind direction (NOTE: actual wind direction is in the opposite direction. This is for consistency of calculations in HexagonGrid)
+wind_strength = 1.5  # Initial wind strength
 
 def gridSize(): 
     global batch_size
