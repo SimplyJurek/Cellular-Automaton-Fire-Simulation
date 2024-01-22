@@ -1,7 +1,6 @@
 import pygame
 import random
 import Global as G
-import Button
 from HexagonGrid import FlatTopHexagonTile
 from HexagonGrid import HexagonTile
 from typing import List
@@ -9,8 +8,17 @@ from pygame.math import Vector2
 from typing import Tuple
 import math
 
-# * Creates a hexagon tile at the specified position
 def create_hexagon(position, radius = G.HEX_RADIUS) -> HexagonTile:
+    """
+    Creates a hexagon tile with random attributes based on the given position.
+
+    Args:
+        position (tuple): The position of the hexagon tile.
+        radius (int, optional): The radius of the hexagon tile. Defaults to G.HEX_RADIUS.
+
+    Returns:
+        HexagonTile: The created hexagon tile object.
+    """
     tempRange = random.randint(0, 100)
     tempHumidity = random.randrange(G.cell_humidity[0], G.cell_humidity[1], G.cell_humidity[2])
     tempDensity = random.randrange(G.cell_density[0], G.cell_density[1], G.cell_density[2])
@@ -36,7 +44,7 @@ def create_hexagon(position, radius = G.HEX_RADIUS) -> HexagonTile:
     if tempState == 0: 
         tempColour = (0, tempG, 0)
     elif tempState == 1: 
-        tempColour = (0, 0, 120)
+        tempColour = (84, 45, 28)
     elif tempState == 2:
         tempColour = (tempR, 0, 0)
     elif tempState == 3:
@@ -55,12 +63,19 @@ def create_hexagon(position, radius = G.HEX_RADIUS) -> HexagonTile:
         cellResistance=tempResistance
         )
 
-# * Creates a hexaogonal tile map of GRID_WIDTH * GRID_HEIGHT
 def init_hexagons(grid_size) -> List[HexagonTile]:
+    """
+    Initializes a grid of hexagon tiles based on the given grid size.
+
+    Args:
+        grid_size (tuple): A tuple containing the number of rows and columns in the grid.
+
+    Returns:
+        List[HexagonTile]: A list of HexagonTile objects representing the grid of hexagons.
+    """
     leftmost_hexagon = create_hexagon(position=(
         (G.SCREEN_WIDTH / 2) - ((grid_size[0] / 4) * (G.hexRadius() * 2) + (grid_size[0] / 4) * G.hexRadius()),
         (G.SCREEN_HEIGHT / 2) - ((grid_size[1] / 4) * (3 * G.hexRadius()) + (grid_size[1] / 4) * G.hexRadius())
-        # TODO still needs adjusting, for pointy top grid it doesnt start centered
     ))
 
     total_cells = grid_size[0] * grid_size[1]
@@ -103,6 +118,9 @@ def init_hexagons(grid_size) -> List[HexagonTile]:
     return hexagons
 
 def display_loading_screen():
+    """
+    Displays a loading screen with a text message indicating that the grid is being generated.
+    """
     G.SCREEN.fill(G.BACKGROUND_COLOUR)
     font = pygame.font.SysFont(None, 36)
     text = font.render('Generating Grid...', True, (255, 255, 255))
@@ -110,6 +128,13 @@ def display_loading_screen():
     pygame.display.update()
 
 def update_loading_progress(message, progress):
+    """
+    Update the loading progress on the screen.
+
+    Args:
+        message (str): The message to display.
+        progress (tuple): A tuple containing the current progress and the total number of cells.
+    """
     G.SCREEN.fill(G.BACKGROUND_COLOUR)
     font = pygame.font.SysFont(None, 36)
     text = font.render(message + f' {progress[0]} of {progress[1]} cells...', True, (255, 255, 255))
@@ -121,25 +146,49 @@ def update_loading_progress(message, progress):
             pygame.quit()
             return
 
-# * Renders hexagons on the screen
 def render(screen, hexagons):
-    for hexagon in hexagons:
-        hexagon.render(screen)  
+    """
+    Renders the hexagons on the screen.
 
-# * Performs change_state on all the cells in the grid.
+    Args:
+        screen (pygame.Surface): The surface to render the hexagons on.
+        hexagons (list): A list of Hexagon objects to be rendered.
+    """
+    for hexagon in hexagons:
+        hexagon.render(screen)
+
 def change_hexagon_states(hexagons):
-    for hexagon in hexagons:
-        hexagon.change_state(hexagons)
+    """
+    Change the states of the given hexagons.
 
-# * Updates the states of each cell in the grid.
+    Parameters:
+    hexagons (list): A list of Hexagon objects.
+    """
+    for hexagon in hexagons:
+        hexagon.change_state()
+
 def update_grid(hexagons):
+    """
+    Update the grid by calling the update method on each hexagon.
+
+    Args:
+        hexagons (list): List of hexagons to update.
+    """
     for hexagon in hexagons:
         hexagon.update()
         
-# Calculate the wind direction vector based on global wind direction
 def calculate_wind_direction_vector(wind_direction: str, length: float) -> Tuple[float, float]:
-    # You need to implement the logic to convert wind direction to a vector
-    # For simplicity, assuming 6 equally spaced directions (hexagonal grid)
+    """
+    Calculates the wind direction vector based on the given wind direction and length.
+
+    Args:
+        wind_direction (str): The direction of the wind. Valid values are 'right', 'bottom_right', 'bottom_left',
+                              'left', 'top_left', 'top_right', 'top', and 'bottom'.
+        length (float): The length of the wind direction vector.
+
+    Returns:
+        Tuple[float, float]: The wind direction vector as a tuple of two floats representing the x and y components.
+    """
     directions = [
         (0, 1),   # Top
         (-0.5, 0.5),  # Bottom-Right
@@ -153,17 +202,23 @@ def calculate_wind_direction_vector(wind_direction: str, length: float) -> Tuple
     index = ['right', 'bottom_right', 'bottom_left', 'left', 'top_left', 'top_right', 'top', 'bottom'].index(wind_direction)
     direction = directions[index]
 
-    # Normalize the vector and multiply by the desired length
     magnitude = math.sqrt(direction[0]**2 + direction[1]**2)
     normalized_vector = Vector2(direction[0] / magnitude, direction[1] / magnitude)
 
     return Vector2(normalized_vector.x * length, normalized_vector.y * length)
 
-# Draw the wind direction arrow
 def draw_wind_triangle(surface, wind_direction, length, position):
+    """
+    Draws a wind triangle on the given surface.
+
+    Args:
+        surface: The surface on which to draw the wind triangle.
+        wind_direction: The direction of the wind in degrees.
+        length: The length of the wind triangle.
+        position: The position of the wind triangle.
+    """
     wind_direction_vector = calculate_wind_direction_vector(wind_direction, length)
 
-    # Draw an isosceles triangle
     base = Vector2(position)
     apex = base + wind_direction_vector.rotate(90)  # Rotate the base vector to get the apex
     wing1 = base + wind_direction_vector
@@ -171,7 +226,6 @@ def draw_wind_triangle(surface, wind_direction, length, position):
 
     pygame.draw.polygon(surface, (200, 200, 200), [apex, wing1, wing2])
     
-    # Render the text
     font = pygame.font.Font(None, 36)
     text_surface = font.render("Wind direction", True, (255, 255, 255))
     text_rect = text_surface.get_rect(center=(position[0], position[1] - 60))  # Adjust the position above the triangle

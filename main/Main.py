@@ -6,56 +6,59 @@ pygame.init()
 # * IMPORTS
 import Core as C
 import Global as G
-from typing import List
-from typing import Tuple
-from HexagonGrid import FlatTopHexagonTile
-from HexagonGrid import HexagonTile
 from Button import Button
 from Clock import Clock
 
-
 # * Options menu
 def options():
+    """
+    Displays the options menu and handles user input for selecting various options.
+
+    This function renders the options menu on the screen and handles the user's selection
+    for forest density, grid size, grid orientation, wind direction, wind strength, cell humidity,
+    cell density, and cell duff. It uses the Button class to create interactive buttons for each option.
+    """
     terminated = False
+    offset = -70
     # Options menu loop
     while not terminated:
         G.SCREEN.fill(G.BACKGROUND_COLOUR)
 
         # Forest density 
         forestDensityText = G.FONT.render('Forest Density', True, (255, 255, 255))
-        forestDensityTextRect = forestDensityText.get_rect(center=(G.SCREEN_WIDTH/2 - 500, 175))
+        forestDensityTextRect = forestDensityText.get_rect(center=(G.SCREEN_WIDTH/2 - 500, 175 + offset))
         G.SCREEN.blit(forestDensityText, forestDensityTextRect)
 
         # Forest density buttons
-        forestDensity_25  = Button('25%',  ((G.SCREEN_WIDTH / 2) - 200, 150), [150, 52, 16])
-        forestDensity_50  = Button('50%',  ((G.SCREEN_WIDTH / 2) + 34, 150), [150, 52, 16])
-        forestDensity_75  = Button('75%',  ((G.SCREEN_WIDTH / 2) + 270,  150), [150, 52, 16])
-        forestDensity_100 = Button('100%', ((G.SCREEN_WIDTH / 2) + 500, 150), [150, 52, 16])
+        forestDensity_70  = Button('70%',  ((G.SCREEN_WIDTH / 2) - 200, 150 + offset), [150, 52, 16])
+        forestDensity_80  = Button('80%',  ((G.SCREEN_WIDTH / 2) + 34, 150 + offset), [150, 52, 16])
+        forestDensity_90  = Button('90%',  ((G.SCREEN_WIDTH / 2) + 270,  150 + offset), [150, 52, 16])
+        forestDensity_100 = Button('100%', ((G.SCREEN_WIDTH / 2) + 500, 150 + offset), [150, 52, 16])
         
-        forestDensity_25.draw(G.forest_density  == 25)
-        forestDensity_50.draw(G.forest_density  == 50)
-        forestDensity_75.draw(G.forest_density  == 75)
+        forestDensity_70.draw(G.forest_density  == 70)
+        forestDensity_80.draw(G.forest_density  == 80)
+        forestDensity_90.draw(G.forest_density  == 90)
         forestDensity_100.draw(G.forest_density == 100)
 
-        if forestDensity_25.check_click(): 
-            forestDensity_25.draw(True)
-        if forestDensity_50.check_click(): 
-            forestDensity_50.draw(True)
-        if forestDensity_75.check_click(): 
-            forestDensity_75.draw(True)
+        if forestDensity_70.check_click(): 
+            forestDensity_70.draw(True)
+        if forestDensity_80.check_click(): 
+            forestDensity_80.draw(True)
+        if forestDensity_90.check_click(): 
+            forestDensity_90.draw(True)
         if forestDensity_100.check_click(): 
             forestDensity_100.draw(True)
 
         # Grid size
         gridSizeText = G.FONT.render('Grid size', True, (255, 255, 255))
-        gridSizeTextRect = gridSizeText.get_rect(center=(G.SCREEN_WIDTH/2 - 500, 250))
+        gridSizeTextRect = gridSizeText.get_rect(center=(G.SCREEN_WIDTH/2 - 500, 250 + offset))
         G.SCREEN.blit(gridSizeText, gridSizeTextRect)
 
         # Grid size buttons
-        gridSize_small  = Button('Min',  ((G.SCREEN_WIDTH / 2) - 200, 225), [150, 52, 16])
-        gridSize_mid  = Button('Mid',  ((G.SCREEN_WIDTH / 2) + 34, 225), [150, 52, 16])
-        gridSize_big  = Button('Big',  ((G.SCREEN_WIDTH / 2) + 270,  225), [150, 52, 16])
-        gridSize_max = Button('Max', ((G.SCREEN_WIDTH / 2) + 500, 225), [150, 52, 16])
+        gridSize_small  = Button('Min',  ((G.SCREEN_WIDTH / 2) - 200, 225 + offset), [150, 52, 16])
+        gridSize_mid  = Button('Mid',  ((G.SCREEN_WIDTH / 2) + 34, 225 + offset), [150, 52, 16])
+        gridSize_big  = Button('Big',  ((G.SCREEN_WIDTH / 2) + 270,  225 + offset), [150, 52, 16])
+        gridSize_max = Button('Max', ((G.SCREEN_WIDTH / 2) + 500, 225 + offset), [150, 52, 16])
         
         gridSize_small.draw(G.grid_size == 'min')
         gridSize_mid.draw(G.grid_size   == 'mid')
@@ -73,12 +76,12 @@ def options():
 
         # Grid orientation
         gridSizeText = G.FONT.render('Grid orientation', True, (255, 255, 255))
-        gridSizeTextRect = gridSizeText.get_rect(center=(G.SCREEN_WIDTH/2 - 500, 325))
+        gridSizeTextRect = gridSizeText.get_rect(center=(G.SCREEN_WIDTH/2 - 500, 325 + offset))
         G.SCREEN.blit(gridSizeText, gridSizeTextRect)
 
         # Grid orientation buttons
-        gridSize_flat  = Button('Flat top',  ((G.SCREEN_WIDTH / 2) - 200, 300), [380, 52, 16])
-        gridSize_point  = Button('Pointy top',  ((G.SCREEN_WIDTH / 2) + 270, 300), [380, 52, 16])
+        gridSize_flat  = Button('Flat top',  ((G.SCREEN_WIDTH / 2) - 200, 300 + offset), [380, 52, 16])
+        gridSize_point  = Button('Pointy top',  ((G.SCREEN_WIDTH / 2) + 270, 300 + offset), [380, 52, 16])
         
         gridSize_flat.draw(G.grid_orientation)
         gridSize_point.draw(not G.grid_orientation)
@@ -91,20 +94,20 @@ def options():
         # Wind direction
         if G.wind_strength != 0.0:     
             windDirectionText = G.FONT.render('Wind Direction', True, (255, 255, 255))
-            windDirectionTextRect = windDirectionText.get_rect(center=(G.SCREEN_WIDTH/2 - 500, 400))
+            windDirectionTextRect = windDirectionText.get_rect(center=(G.SCREEN_WIDTH/2 - 500, 400 + offset))
             G.SCREEN.blit(windDirectionText, windDirectionTextRect)
 
         # Wind direction buttons
-        wind_direction_top_left = Button('Top Left', ((G.SCREEN_WIDTH / 2) - 200, 375), [380, 52, 16])
-        wind_direction_top_right = Button('Top Right', ((G.SCREEN_WIDTH / 2) + 270, 375), [380, 52, 16])
-        wind_direction_bottom_left = Button('Bottom Left', ((G.SCREEN_WIDTH / 2) - 200, 435), [380, 52, 16])
-        wind_direction_bottom_right = Button('Bottom Right', ((G.SCREEN_WIDTH / 2) + 270, 435), [380, 52, 16])
+        wind_direction_top_left = Button('Top Left', ((G.SCREEN_WIDTH / 2) - 200, 375 + offset), [380, 52, 16])
+        wind_direction_top_right = Button('Top Right', ((G.SCREEN_WIDTH / 2) + 270, 375 + offset), [380, 52, 16])
+        wind_direction_bottom_left = Button('Bottom Left', ((G.SCREEN_WIDTH / 2) - 200, 435 + offset), [380, 52, 16])
+        wind_direction_bottom_right = Button('Bottom Right', ((G.SCREEN_WIDTH / 2) + 270, 435 + offset), [380, 52, 16])
         if G.grid_orientation:
-            wind_direction_top = Button('Top', ((G.SCREEN_WIDTH / 2) - 200, 495), [380, 52, 16])
-            wind_direction_bottom = Button('Bottom', ((G.SCREEN_WIDTH / 2) + 270, 495), [380, 52, 16])
+            wind_direction_top = Button('Top', ((G.SCREEN_WIDTH / 2) - 200, 495 + offset), [380, 52, 16])
+            wind_direction_bottom = Button('Bottom', ((G.SCREEN_WIDTH / 2) + 270, 495 + offset), [380, 52, 16])
         else:
-            wind_direction_left = Button('Left', ((G.SCREEN_WIDTH / 2) - 200, 495), [380, 52, 16])
-            wind_direction_right = Button('Right', ((G.SCREEN_WIDTH / 2) + 270, 495), [380, 52, 16])
+            wind_direction_left = Button('Left', ((G.SCREEN_WIDTH / 2) - 200, 495 + offset), [380, 52, 16])
+            wind_direction_right = Button('Right', ((G.SCREEN_WIDTH / 2) + 270, 495 + offset), [380, 52, 16])
         
         if G.wind_strength != 0.0:
             wind_direction_top_left.draw(G.wind_direction == 'bottom_right')
@@ -139,15 +142,14 @@ def options():
             
         # Wind strength
         windStrengthText = G.FONT.render('Wind Strength', True, (255, 255, 255))
-        windStrengthTextRect = windStrengthText.get_rect(center=(G.SCREEN_WIDTH/2 - 500, 595))
+        windStrengthTextRect = windStrengthText.get_rect(center=(G.SCREEN_WIDTH/2 - 500, 595 + offset))
         G.SCREEN.blit(windStrengthText, windStrengthTextRect)
 
         # Wind strength buttons
-        wind_strength_weak = Button('Weak', ((G.SCREEN_WIDTH / 2) - 200, 570), [150, 52, 16])
-        wind_strength_moderate = Button('Moderate', ((G.SCREEN_WIDTH / 2) + 34, 570), [150, 52, 16])
-        wind_strength_strong = Button('Strong', ((G.SCREEN_WIDTH / 2) + 270, 570), [150, 52, 16])
-        wind_strength_none = Button('None', ((G.SCREEN_WIDTH / 2) + 500, 570), [150, 52, 16])
-
+        wind_strength_weak = Button('Weak', ((G.SCREEN_WIDTH / 2) - 200, 570 + offset), [150, 52, 16])
+        wind_strength_moderate = Button('Moderate', ((G.SCREEN_WIDTH / 2) + 34, 570 + offset), [150, 52, 16])
+        wind_strength_strong = Button('Strong', ((G.SCREEN_WIDTH / 2) + 270, 570 + offset), [150, 52, 16])
+        wind_strength_none = Button('None', ((G.SCREEN_WIDTH / 2) + 500, 570 + offset), [150, 52, 16])
 
         wind_strength_weak.draw(G.wind_strength == 1.5)
         wind_strength_moderate.draw(G.wind_strength == 2.3)
@@ -165,13 +167,13 @@ def options():
 
         # Cell Humidity
         cellHumidityText = G.FONT.render('Cell Humidity', True, (255, 255, 255))
-        cellHumidityTextRect = cellHumidityText.get_rect(center=((G.SCREEN_WIDTH / 2) - 500, 670))
+        cellHumidityTextRect = cellHumidityText.get_rect(center=((G.SCREEN_WIDTH / 2) - 500, 670 + offset))
         G.SCREEN.blit(cellHumidityText, cellHumidityTextRect)
 
         # Cell Humidity Buttons
-        cell_humidity_dry = Button('Dry', ((G.SCREEN_WIDTH / 2) - 200, 645), [150, 52, 16])
-        cell_humidity_medium = Button('Medium', ((G.SCREEN_WIDTH / 2) + 34, 645), [150, 52, 16])
-        cell_humidity_high = Button('Humid', ((G.SCREEN_WIDTH / 2) + 270, 645), [150, 52, 16])
+        cell_humidity_dry = Button('Dry', ((G.SCREEN_WIDTH / 2) - 200, 645 + offset), [150, 52, 16])
+        cell_humidity_medium = Button('Medium', ((G.SCREEN_WIDTH / 2) + 34, 645 + offset), [150, 52, 16])
+        cell_humidity_high = Button('Humid', ((G.SCREEN_WIDTH / 2) + 270, 645 + offset), [150, 52, 16])
 
         cell_humidity_dry.draw(G.cell_humidity == [0, 30, 5])
         cell_humidity_medium.draw(G.cell_humidity == [10, 50, 5])
@@ -186,13 +188,13 @@ def options():
 
         # Cell Density
         cellDensityText = G.FONT.render('Cell Density', True, (255, 255, 255))
-        cellDensityTextRect = cellDensityText.get_rect(center=((G.SCREEN_WIDTH / 2) - 500, 745))
+        cellDensityTextRect = cellDensityText.get_rect(center=((G.SCREEN_WIDTH / 2) - 500, 745 + offset))
         G.SCREEN.blit(cellDensityText, cellDensityTextRect)
 
         # Cell density Buttons
-        cell_density_sparse = Button('Sparse', ((G.SCREEN_WIDTH / 2) - 200, 720), [150, 52, 16])
-        cell_density_medium = Button('Medium', ((G.SCREEN_WIDTH / 2) + 34, 720), [150, 52, 16])
-        cell_density_dense = Button('Dense', ((G.SCREEN_WIDTH / 2) + 270, 720), [150, 52, 16])
+        cell_density_sparse = Button('Sparse', ((G.SCREEN_WIDTH / 2) - 200, 720 + offset), [150, 52, 16])
+        cell_density_medium = Button('Medium', ((G.SCREEN_WIDTH / 2) + 34, 720 + offset), [150, 52, 16])
+        cell_density_dense = Button('Dense', ((G.SCREEN_WIDTH / 2) + 270, 720 + offset), [150, 52, 16])
 
         cell_density_sparse.draw(G.cell_density == [25, 75, 5])
         cell_density_medium.draw(G.cell_density == [50, 100, 5])
@@ -207,13 +209,13 @@ def options():
 
         # Cell Duff
         cellDuffText = G.FONT.render('Cell Duff', True, (255, 255, 255))
-        cellDuffTextRect = cellDuffText.get_rect(center=((G.SCREEN_WIDTH / 2) - 500, 820))
+        cellDuffTextRect = cellDuffText.get_rect(center=((G.SCREEN_WIDTH / 2) - 500, 820 + offset))
         G.SCREEN.blit(cellDuffText, cellDuffTextRect)
 
         # Cell duff Buttons
-        cell_duff_sparse = Button('Sparse', ((G.SCREEN_WIDTH / 2) - 200, 795), [150, 52, 16])
-        cell_duff_medium = Button('Medium', ((G.SCREEN_WIDTH / 2) + 34, 795), [150, 52, 16])
-        cell_duff_dense = Button('Dense', ((G.SCREEN_WIDTH / 2) + 270, 795), [150, 52, 16])
+        cell_duff_sparse = Button('Sparse', ((G.SCREEN_WIDTH / 2) - 200, 795 + offset), [150, 52, 16])
+        cell_duff_medium = Button('Medium', ((G.SCREEN_WIDTH / 2) + 34, 795 + offset), [150, 52, 16])
+        cell_duff_dense = Button('Dense', ((G.SCREEN_WIDTH / 2) + 270, 795 + offset), [150, 52, 16])
 
         cell_duff_sparse.draw(G.cell_duff == [25, 75, 5])
         cell_duff_medium.draw(G.cell_duff == [50, 100, 5])
@@ -226,11 +228,8 @@ def options():
         if cell_duff_dense.check_click():
             cell_duff_dense.draw(True)
 
-        
-
         # Return to main menu button
         backButton = Button('Back', ((G.SCREEN_WIDTH / 2) - 150, (G.SCREEN_HEIGHT - 200)), [300, 150, 48])
-
         backButton.draw()
 
         if backButton.check_click():
@@ -243,12 +242,12 @@ def options():
                 terminated = True
             # On click
             if event.type == pygame.MOUSEBUTTONUP:
-                if forestDensity_25.check_click(): 
-                    G.forest_density = 25
-                if forestDensity_50.check_click(): 
-                    G.forest_density = 50
-                if forestDensity_75.check_click(): 
-                    G.forest_density = 75
+                if forestDensity_70.check_click(): 
+                    G.forest_density = 70
+                if forestDensity_80.check_click(): 
+                    G.forest_density = 80
+                if forestDensity_90.check_click(): 
+                    G.forest_density = 90
                 if forestDensity_100.check_click(): 
                     G.forest_density = 100
 
@@ -282,8 +281,12 @@ def options():
 
                 if gridSize_flat.check_click(): 
                     G.grid_orientation = True
+                    if G.wind_direction == 'right' or G.wind_direction == 'left':
+                        G.wind_direction = 'bottom_right'
                 if gridSize_point.check_click(): 
                     G.grid_orientation = False
+                    if G.wind_direction == 'top' or G.wind_direction == 'bottom':
+                        G.wind_direction = 'bottom_right'
                     
                 if wind_strength_weak.check_click():
                     G.wind_strength = 1.5
@@ -325,6 +328,12 @@ def options():
 
 # * Main simulation function
 def automata_main():
+    """
+    Main function for running the automata simulation.
+
+    This function initializes the necessary variables and objects, handles user input,
+    updates the simulation state, and renders the simulation on the screen.
+    """
     C.display_loading_screen()
     hexagons = C.init_hexagons(G.gridSize())
     clock = Clock(time.time())
@@ -342,8 +351,6 @@ def automata_main():
         pauseButton = Button('Pause', (G.SCREEN_WIDTH/2 - 175, G.SCREEN_HEIGHT - 125), [150, 75, 36])
         resetButton = Button('Reset', (G.SCREEN_WIDTH/2 + 25, G.SCREEN_HEIGHT - 125), [150, 75, 36])
         backButton = Button('Back', (G.SCREEN_WIDTH/2 + 225, G.SCREEN_HEIGHT - 125), [150, 75, 36])
-        
-
 
         # Event handler
         for event in pygame.event.get():
@@ -356,6 +363,21 @@ def automata_main():
 
                 # Left click
                 if event.button == 1:
+                    if startButton.check_click():
+                        if pause == True: pause = False
+                        else: pass
+                        break
+                    if pauseButton.check_click():
+                        if pause == False: pause = True
+                        else: pass
+                        break
+                    if resetButton.check_click(): 
+                        automata_main()
+                        break
+                    if backButton.check_click(): 
+                        main()
+                        break
+
                     colliding_hexagons = [
                         hexagon for hexagon in hexagons if hexagon.collide_with_point(mouse_pos)
                     ]
@@ -374,18 +396,7 @@ def automata_main():
                     ]
                     for hexagon in colliding_hexagons:
                         hexagon.state = 1
-                        hexagon.colour = [0, 0, 120]
-                
-                if startButton.check_click():
-                    if pause == True: pause = False
-                    else: pass
-                if pauseButton.check_click():
-                    if pause == False: pause = True
-                    else: pass
-                if resetButton.check_click(): 
-                    automata_main()
-                if backButton.check_click(): 
-                    main()
+                        hexagon.colour = [84, 45, 28]                
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 # camera handling
@@ -437,12 +448,21 @@ def automata_main():
         if backButton.check_click():
             backButton.draw(True)
 
+        fps = G.CLOCK.get_fps()
+        fps_text = f"FPS: {int(fps)}"
+        
+        pygame.display.set_caption(fps_text) 
+        
         pygame.display.flip()
         G.CLOCK.tick(G.FPS)
+        
     pygame.display.quit()
 
 # * Main menu
 def main():
+    """
+    Main function that runs the game loop for the main menu.
+    """
     terminated = False
     # Main menu loop
     while not terminated:
@@ -479,7 +499,7 @@ def main():
                     options()
                 if exitButton.check_click(): 
                     terminated = True   
-
+   
         pygame.display.update()
         G.CLOCK.tick(G.FPS)
         

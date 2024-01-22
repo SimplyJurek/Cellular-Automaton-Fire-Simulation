@@ -13,6 +13,15 @@ class Button:
             size: list,
             enabled: bool = True
         ):
+        """
+        Initializes a Button object.
+
+        Args:
+            text (str): The text to be displayed on the button.
+            position (Tuple): The position of the button on the screen.
+            size (list): The size of the button (width, height).
+            enabled (bool, optional): Whether the button is enabled or disabled. Defaults to True.
+        """
         self.text = text
         self.fontSize = size.pop()
         self.position = position
@@ -22,6 +31,12 @@ class Button:
 
 
     def draw(self, selected=False):
+        """
+        Draws the button on the screen.
+
+        Args:
+            selected (bool, optional): Whether the button is selected or not. Defaults to False.
+        """
         if selected:
             buttonText = self.font.render(self.text, True, G.TEXT_COLOUR_HIGHLIGHT)
             colour = G.BUTTON_COLOUR_HIGHLIGHT
@@ -34,6 +49,12 @@ class Button:
         G.SCREEN.blit(buttonText, buttonTextRect)
 
     def check_click(self):
+        """
+        Checks if the button is clicked.
+
+        Returns:
+            bool: True if the button is clicked and enabled, False otherwise.
+        """
         pos = pygame.mouse.get_pos()
         buttonRect = pygame.rect.Rect(self.position, self.size)
         if buttonRect.collidepoint(pos) and self.enabled:

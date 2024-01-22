@@ -9,10 +9,43 @@ import Global as G
 
 import pygame
 
-
 @dataclass
 class HexagonTile:
-    """Hexagon class"""
+    """
+    Represents a hexagonal tile in a hexagonal grid.
+
+    Attributes:
+    - radius: The radius of the hexagon.
+    - position: The position of the hexagon's center as a tuple of floats (x, y).
+    - colour: The colour of the hexagon as a tuple of integers (r, g, b).
+    - state: The current state of the hexagon.
+    - nextstate: The next state of the hexagon.
+    - neighbours_dict: A dictionary containing the neighbouring hexagons.
+    - cellHumidity: The humidity of the cell.
+    - cellDensity: The density of the cell.
+    - cellDuff: The duff of the cell.
+    - cellHealth: The health of the cell.
+    - cellResistance: The resistance of the cell.
+
+    Methods:
+    - __post_init__: Initializes the hexagon object.
+    - change_state: Calculates whether the state of the cell should change in the next iteration.
+    - update: Updates the cell's state based on its current nextstate value.
+    - compute_vertices: Computes the vertices of the hexagon.
+    - is_neighbourXwind_on_fire: Checks if the neighbour which is on fire is on the same side that the wind is blowing from.
+    - relative_position_flat_top: Returns the relative position of a given hexagon with respect to the current flat-top hexagon.
+    - relative_position_pointy_top: Returns the relative position of a given hexagon with respect to the current pointy-top hexagon.
+    - compute_neighbours: Fills the neighbours_dict with valid neighbors.
+    - collide_with_point: Returns True if the distance from the center to a point is less than the horizontal length.
+    - is_neighbour: Returns True if a hexagon is a neighbor based on its center position.
+    - neighbours_on_fire: Returns the number of neighboring hexagons that are on fire.
+    - avg_neighbour_color: Returns the average color of neighboring hexagons that are on fire.
+    - apply_camera_offset: Applies camera shift to hexagon objects and their hitboxes.
+    - render: Renders the hexagon on the screen.
+    - fire_glimmer: Makes the hexagon fire glimmer, taking into consideration the average color of neighboring hexagons.
+    - centre: Returns the center of the hexagon.
+    - minimal_radius: Returns the horizontal length of the hexagon.
+    """
     radius: float
     position: Tuple[float, float]
     colour: Tuple[int, ...] = (0, 120, 0)
@@ -28,12 +61,11 @@ class HexagonTile:
     def __post_init__(self):
         self.vertices = self.compute_vertices()
 
-    def change_state(self, hexlist):
+    def change_state(self):
         """Calculates whether the state of the cell should change in the next iteration. If yes, changes the nextstate value."""
         if self.state == 0:
-            neighbour_state_counter = sum(1 for neighbour in self.neighbours_dict.values() if neighbour is not None and neighbour.state == 2)
             wind_blowing_towards_me = self.is_neighbourXwind_on_fire()
-            if neighbour_state_counter >= 2:
+            if self.neighbours_on_fire() >= 2:
                 if wind_blowing_towards_me:
                     self.cellHumidity -= 1 * G.wind_strength
                 else:
@@ -58,11 +90,16 @@ class HexagonTile:
         if self.nextstate > self.state:
             self.state = self.nextstate
             if self.state == 0:
-                self.colour = [0, 120, 0]
+                self.colour = [84, 45, 28]
             elif self.state == 2:
-                self.colour = [120, 0, 0]
+                self.colour = [random.randint(180, 255), random.randint(0, 80), 0]
             else:
-                self.colour = [100, 100, 100]
+                random_grey = random.randint(90, 110)
+                self.colour = [random_grey, random_grey, random_grey]
+        elif self.state == 2 and pygame.time.get_ticks() % 4 == 0:
+            self.colour = self.fire_glimmer()
+        elif self.state == 3 and pygame.time.get_ticks() % 4 == 0 and all(c > 70 for c in self.colour):
+            self.colour = [c - 5 for c in self.colour]
 
     def compute_vertices(self) -> List[Tuple[float, float]]:
         """Returns a list of the hexagon's vertices as x, y tuples"""
@@ -165,9 +202,6 @@ class HexagonTile:
 
                 self.neighbours_dict[relative_position] = hexagon
         
-
-        
-
     def collide_with_point(self, point: Tuple[float, float]) -> bool:
         """Returns True if distance from centre to point is less than horizontal_length"""
         return math.dist(point, self.apply_camera_offset(self.centre)) < self.minimal_radius
@@ -178,6 +212,30 @@ class HexagonTile:
         """
         distance = math.dist(hexagon.centre, self.centre)
         return math.isclose(distance, 2 * self.minimal_radius, rel_tol=0.05)
+    
+    def neighbours_on_fire(self):
+        """Returns the number of neighboring hexagons that are on fire."""
+        return sum(1 for neighbour in self.neighbours_dict.values() if neighbour is not None and neighbour.state == 2)
+
+    def avg_neighbour_color(self):
+        """Returns the average color of neighboring hexagons that are on fire."""
+        total_r, total_g, total_b = 0, 0, 0
+        count = 0
+
+        for neighbour in self.neighbours_dict.values():
+            if neighbour is not None and neighbour.state == 2:
+                total_r += neighbour.colour[0]
+                total_g += neighbour.colour[1]
+                total_b += neighbour.colour[2]
+                count += 1
+
+        if count > 0:
+            avg_r = total_r // count
+            avg_g = total_g // count
+            avg_b = total_b // count
+            return [avg_r, avg_g, avg_b]
+        else:
+            return [0, 0, 0]
     
     def apply_camera_offset(self, coords: Tuple) -> Tuple:
         """applies camera shift to hexagon objects and their hitboxes"""
@@ -197,7 +255,40 @@ class HexagonTile:
         """Renders the hexagon on the screen"""
         pygame.draw.polygon(screen, self.colour, self.apply_camera_offset(self.vertices))
         pygame.draw.aalines(screen, color = [0, 0, 0], closed=True, points=self.apply_camera_offset(self.vertices))
+    
+    def fire_glimmer(self) -> None:
+        """Makes the hexagon fire glimmer, taking into consideration the average color of neighboring hexagons"""
+        fire_intensity = self.neighbours_on_fire()
+        avg_color = self.avg_neighbour_color()
+        cell_health = self.cellHealth
+        
+        red = 255
+        green = random.randint(0, 150 - (fire_intensity * 10))
+        blue = random.randint(0, 30) if fire_intensity > 3 else 0
+        
+        if fire_intensity > 4:
+            red = random.randint(220, 255)
+            green = random.randint(green, 200)
+        
+        # Adjust the color based on the average color of neighboring hexagons
+        red = (red + avg_color[0]) // 2
+        green = (green + avg_color[1]) // 2
+        blue = (blue + avg_color[2]) // 2
+        
+        # this didnt really work but i'll leave it here for now
 
+        # # Make the color progressively darker based on cell health
+        # red = red + ((100 - red) * (100 - cell_health) // 100)
+        # green = green + ((100 - green) * (100 - cell_health) // 100)
+        # blue = blue + ((100 - blue) * (100 - cell_health) // 100)
+        
+        # # Ensure color values are within the valid range
+        # red = max(0, min(red, 255))
+        # green = max(0, min(green, 255))
+        # blue = max(0, min(blue, 255))
+        
+        return [red, green, blue]
+        
     @property   
     def centre(self) -> Tuple[float, float]:
         """Centre of the hexagon"""
