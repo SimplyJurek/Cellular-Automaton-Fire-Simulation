@@ -25,7 +25,9 @@ class HexagonTile:
     - cellDensity: The density of the cell.
     - cellDuff: The duff of the cell.
     - cellHealth: The health of the cell.
+    - cellMaxHealth: The initial health value of the cell.
     - cellResistance: The resistance of the cell.
+    
 
     Methods:
     - __post_init__: Initializes the hexagon object.
@@ -56,6 +58,7 @@ class HexagonTile:
     cellDensity: float = 0
     cellDuff: float = 0 
     cellHealth: float = 0
+    cellMaxHealth: float = 0
     cellResistance: float = 0
 
     def __post_init__(self):
@@ -78,11 +81,11 @@ class HexagonTile:
         if self.state == 2:
             self.cellDensity -= 0.25
             self.cellDuff -= 1
-            cellHealth = (
+            self.cellHealth = (
                 self.cellDensity + 
                 self.cellDuff
                 )
-            if cellHealth <= 0:
+            if self.cellHealth <= 0:
                 self.nextstate = 3
         
     def update(self):
@@ -92,12 +95,20 @@ class HexagonTile:
             if self.state == 0:
                 self.colour = [84, 45, 28]
             elif self.state == 2:
-                self.colour = [random.randint(180, 255), random.randint(0, 80), 0]
+                if G.sim_visuals:
+                    self.colour = [255, 128, 0]
+                else:
+                    self.colour = [random.randint(180, 255), random.randint(0, 80), 0]
             else:
                 random_grey = random.randint(90, 110)
                 self.colour = [random_grey, random_grey, random_grey]
-        elif self.state == 2 and pygame.time.get_ticks() % 4 == 0:
-            self.colour = self.fire_glimmer()
+        elif self.state == 2:
+            if not G.sim_visuals and pygame.time.get_ticks() % 4 == 0:
+                self.colour = self.fire_glimmer()
+            elif G.sim_visuals:
+                red_value, green_value = self.map_health_to_colour(self.cellHealth, self.cellMaxHealth)
+                self.colour[0] = red_value
+                self.colour[1] = green_value
         elif self.state == 3 and pygame.time.get_ticks() % 4 == 0 and all(c > 70 for c in self.colour):
             self.colour = [c - 5 for c in self.colour]
 
@@ -288,6 +299,33 @@ class HexagonTile:
         # blue = max(0, min(blue, 255))
         
         return [red, green, blue]
+    
+    def map_health_to_colour(self, health, max_health=150):
+        """
+        Maps the cell's health to the red and green value in RGB color.
+
+        Parameters:
+        - health (float): The health of the cell, ranging from 0 to max_health.
+        - max_health (float): The maximum health of the cell.
+
+        Returns:
+        - int: The corresponding red and green.
+        """
+        max_red = 255
+        min_red = 150
+        max_green = 128
+        min_green = 0
+        
+        # Ensure health is within the valid range [0, max_health]
+        health = max(0, min(max_health, health))
+
+        # Normalize health to the range [0, 1]
+        normalized_health = health / max_health
+        
+        red_value = int((1 - normalized_health) * min_red + normalized_health * max_red)
+        green_value = int((1 - normalized_health) * min_green + normalized_health * max_green)
+
+        return red_value, green_value
         
     @property   
     def centre(self) -> Tuple[float, float]:

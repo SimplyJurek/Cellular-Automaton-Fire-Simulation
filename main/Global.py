@@ -34,6 +34,7 @@ zoom_factor = 1.0
 batch_size = 5
 wind_direction = 'bottom_right'  # Initial wind direction (NOTE: actual wind direction is in the opposite direction. This is for consistency of calculations in HexagonGrid)
 wind_strength = 1.5  # Initial wind strength
+sim_visuals = True # Makes the fire cells dimmer the less health they have when set to True
 
 def gridSize(): 
     global batch_size

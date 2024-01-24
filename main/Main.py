@@ -228,6 +228,18 @@ def options():
         if cell_duff_dense.check_click():
             cell_duff_dense.draw(True)
 
+        # Sim visuals
+        simVisualsText = G.FONT.render('Visuals', True, (255, 255, 255))
+        simVisualsTextRect = simVisualsText.get_rect(center=((G.SCREEN_WIDTH / 2) - 500, 890 + offset))
+        G.SCREEN.blit(simVisualsText, simVisualsTextRect)
+
+        # Sim visuals buttons
+        simVisualsTrueButton = Button('Simulation', ((G.SCREEN_WIDTH / 2) - 200, 870 + offset), [380, 52, 16])
+        simVisualsFalseButton = Button('Eye candy', ((G.SCREEN_WIDTH / 2) + 270, 870 + offset), [380, 52, 16])
+
+        simVisualsTrueButton.draw(G.sim_visuals)
+        simVisualsFalseButton.draw(not G.sim_visuals)
+
         # Return to main menu button
         backButton = Button('Back', ((G.SCREEN_WIDTH / 2) - 150, (G.SCREEN_HEIGHT - 200)), [300, 150, 48])
         backButton.draw()
@@ -317,6 +329,11 @@ def options():
                     G.cell_duff = [50, 100, 5]
                 if cell_duff_dense.check_click():
                     G.cell_duff = [75, 150, 5]
+                    
+                if simVisualsTrueButton.check_click():
+                    G.sim_visuals = True
+                if simVisualsFalseButton.check_click():
+                    G.sim_visuals = False
 
                 if backButton.check_click(): 
                     main()
@@ -383,7 +400,7 @@ def automata_main():
                     ]
                     for hexagon in colliding_hexagons:
                         hexagon.state = 2
-                        hexagon.colour = [120, 0, 0]    
+                        hexagon.colour = [255, 128, 0]    
                 
                 # Middle click
                 if event.button == 2:

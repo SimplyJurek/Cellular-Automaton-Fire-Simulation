@@ -31,10 +31,8 @@ def create_hexagon(position, radius = G.HEX_RADIUS) -> HexagonTile:
         tempR = 255
     else:
         tempR = tempHealth * 4
-    if tempResistance * 4 > 255:
-        tempG = 255
-    else:
-        tempG = tempResistance * 4
+        
+    tempG = map_resistance_to_green(tempResistance)
 
     if tempRange / G.forest_density <= 1:
         tempState = 0
@@ -60,6 +58,7 @@ def create_hexagon(position, radius = G.HEX_RADIUS) -> HexagonTile:
         state=tempState,
         colour=tempColour,
         cellHealth=tempHealth,
+        cellMaxHealth=tempHealth,
         cellResistance=tempResistance
         )
 
@@ -231,5 +230,26 @@ def draw_wind_triangle(surface, wind_direction, length, position):
     text_rect = text_surface.get_rect(center=(position[0], position[1] - 60))  # Adjust the position above the triangle
     surface.blit(text_surface, text_rect)
 
+def map_resistance_to_green(resistance):
+    """
+    Maps the cell's resistance to the green value in RGB color.
 
+    Parameters:
+    - resistance (float): The resistance of the cell, as calculated in create_hexagon.
+
+    Returns:
+    - int: The corresponding green value.
+    """
+    max_green = 180
+    min_green = 50
+    
+    # Ensure health is within the valid range [0, max_health]
+    resistance = max(0, min(G.cell_humidity[1], resistance))
+
+    # Normalize health to the range [0, 1]
+    normalized_health = resistance / G.cell_humidity[1]
+    
+    green_value = int((1 - normalized_health) * min_green + normalized_health * max_green)
+
+    return green_value
 
