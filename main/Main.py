@@ -399,8 +399,9 @@ def automata_main():
                         hexagon for hexagon in hexagons if hexagon.collide_with_point(mouse_pos)
                     ]
                     for hexagon in colliding_hexagons:
-                        hexagon.state = 2
-                        hexagon.colour = [255, 128, 0]    
+                        if hexagon.state != 3:
+                            hexagon.state = 2
+                            hexagon.colour = [255, 128, 0]    
                 
                 # Middle click
                 if event.button == 2:
@@ -443,7 +444,7 @@ def automata_main():
         if not pause:
             clock.resume()
             C.change_hexagon_states(hexagons)        
-            C.update_grid(hexagons)
+            C.update_grid(hexagons, clock.time)
         else:
             clock.pause()
         

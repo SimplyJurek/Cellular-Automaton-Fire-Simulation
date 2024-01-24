@@ -6,6 +6,7 @@ from typing import List
 from typing import Tuple
 import random
 import Global as G
+import Clock
 
 import pygame
 
@@ -88,7 +89,7 @@ class HexagonTile:
             if self.cellHealth <= 0:
                 self.nextstate = 3
         
-    def update(self):
+    def update(self, clocktime):
         """Updates the Cell's state based on it's current nextstate value."""
         if self.nextstate > self.state:
             self.state = self.nextstate
@@ -100,8 +101,18 @@ class HexagonTile:
                 else:
                     self.colour = [random.randint(180, 255), random.randint(0, 80), 0]
             else:
-                random_grey = random.randint(90, 110)
-                self.colour = [random_grey, random_grey, random_grey]
+                if G.sim_visuals:
+                    gray = 20
+                    gray_on_time = (gray + ((clocktime[1] * 60)+ 1) + (clocktime[2] + 1)) * 2
+                    if gray_on_time < 230:
+                        self.colour = [gray_on_time, gray_on_time, gray_on_time]
+                    else:
+                        self.colour = [230, 230, 230]
+                    print(self.colour)
+                    
+                else:
+                    random_gray = random.randint(90, 110)
+                    self.colour = [random_gray, random_gray, random_gray]
         elif self.state == 2:
             if not G.sim_visuals and pygame.time.get_ticks() % 4 == 0:
                 self.colour = self.fire_glimmer()
@@ -109,8 +120,9 @@ class HexagonTile:
                 red_value, green_value = self.map_health_to_colour(self.cellHealth, self.cellMaxHealth)
                 self.colour[0] = red_value
                 self.colour[1] = green_value
-        elif self.state == 3 and pygame.time.get_ticks() % 4 == 0 and all(c > 70 for c in self.colour):
-            self.colour = [c - 5 for c in self.colour]
+        elif self.state == 3 and not G.sim_visuals and pygame.time.get_ticks() % 4 == 0 and all(c > 70 for c in self.colour):
+                self.colour = [c - 5 for c in self.colour]
+
 
     def compute_vertices(self) -> List[Tuple[float, float]]:
         """Returns a list of the hexagon's vertices as x, y tuples"""
@@ -138,7 +150,6 @@ class HexagonTile:
                 return True
         return False
 
-        return 0.0  # No wind influence in this case
         
     def relative_position_flat_top(self, other_hexagon: HexagonTile) -> str:
         """

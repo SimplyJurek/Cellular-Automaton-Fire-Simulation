@@ -166,7 +166,7 @@ def change_hexagon_states(hexagons):
     for hexagon in hexagons:
         hexagon.change_state()
 
-def update_grid(hexagons):
+def update_grid(hexagons, clocktime):
     """
     Update the grid by calling the update method on each hexagon.
 
@@ -174,7 +174,7 @@ def update_grid(hexagons):
         hexagons (list): List of hexagons to update.
     """
     for hexagon in hexagons:
-        hexagon.update()
+        hexagon.update(clocktime)
         
 def calculate_wind_direction_vector(wind_direction: str, length: float) -> Tuple[float, float]:
     """
