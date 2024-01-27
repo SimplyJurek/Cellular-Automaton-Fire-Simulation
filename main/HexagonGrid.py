@@ -17,7 +17,7 @@ class HexagonTile:
 
     Attributes:
     - radius: The radius of the hexagon.
-    - position: The position of the hexagon's center as a tuple of floats (x, y).
+    - position: The position of one of the hexagon's corners as a tuple of floats (x, y).
     - colour: The colour of the hexagon as a tuple of integers (r, g, b).
     - state: The current state of the hexagon.
     - nextstate: The next state of the hexagon.
@@ -149,36 +149,8 @@ class HexagonTile:
             if G.wind_direction in wind_directions_on_fire:
                 return True
         return False
-
-        
-    def relative_position_flat_top(self, other_hexagon: HexagonTile) -> str:
-        """
-        Returns the relative position of the given hexagon with respect to the current flat-top hexagon.
-        Possible values: 'top_left', 'bottom_left', 'top_right', 'bottom_right', 'top', 'bottom'
-        """
-        x1, y1 = self.position
-        x2, y2 = other_hexagon.position
-
-        if x2 < x1 - self.radius:
-            if y2 < y1:
-                return 'top_left'
-            elif y2 > y1:
-                return 'bottom_left'
-        elif x2 > x1 + self.radius:
-            if y2 < y1:
-                return 'top_right'
-            elif y2 > y1:
-                return 'bottom_right'
-        else:
-            if y2 < y1:
-                return 'top'
-            elif y2 > y1:
-                return 'bottom'
-
-        # If the hexagons are at the same position
-        return 'same_position'
     
-    def relative_position_pointy_top(self, other_hexagon: HexagonTile) -> str:
+    def relative_neighbour_position(self, other_hexagon: HexagonTile) -> str:
         """
         Returns the relative position of the given hexagon with respect to the current pointy-top hexagon.
         Possible values: 'top_left', 'top_right', 'left', 'right', 'bottom_left', 'bottom_right'
@@ -217,12 +189,8 @@ class HexagonTile:
 
         for hexagon in hexagons:
             if self.is_neighbour(hexagon):
-                if G.grid_orientation:
-                    relative_position = self.relative_position_flat_top(hexagon)
-                else:
-                    relative_position = self.relative_position_pointy_top(hexagon)
-
-                self.neighbours_dict[relative_position] = hexagon
+                hex_relative_position = self.relative_neighbour_position(hexagon)
+                self.neighbours_dict[hex_relative_position] = hexagon
         
     def collide_with_point(self, point: Tuple[float, float]) -> bool:
         """Returns True if distance from centre to point is less than horizontal_length"""
@@ -364,6 +332,33 @@ class FlatTopHexagonTile(HexagonTile):
             (x + 3 * half_radius, y + minimal_radius),
             (x + self.radius, y),
         ]
+            
+    def relative_neighbour_position(self, other_hexagon: HexagonTile) -> str:
+        """
+        Returns the relative position of the given hexagon with respect to the current flat-top hexagon.
+        Possible values: 'top_left', 'bottom_left', 'top_right', 'bottom_right', 'top', 'bottom'
+        """
+        x1, y1 = self.position
+        x2, y2 = other_hexagon.position
+
+        if x2 < x1 - self.radius:
+            if y2 < y1:
+                return 'top_left'
+            elif y2 > y1:
+                return 'bottom_left'
+        elif x2 > x1 + self.radius:
+            if y2 < y1:
+                return 'top_right'
+            elif y2 > y1:
+                return 'bottom_right'
+        else:
+            if y2 < y1:
+                return 'top'
+            elif y2 > y1:
+                return 'bottom'
+
+        # If the hexagons are at the same position
+        return 'same_position'
 
     @property
     def centre(self) -> Tuple[float, float]:
