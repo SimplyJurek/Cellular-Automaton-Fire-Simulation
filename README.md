@@ -1,4 +1,4 @@
-# ProjektInzynierski
+# Symulacja pożaru za pomocą automatu komórkowego w języku Python
 ### Potrzebne moduły:
 - pygame
 ### Zasada dziłania symulatora:
