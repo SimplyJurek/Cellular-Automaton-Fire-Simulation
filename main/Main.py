@@ -358,7 +358,6 @@ def automata_main():
     pause = True
     mouse_dragging = False
     original_mouse_position = None
-    buttons = []
     # Simulation loop    
     while not terminated:
         clock.update()
@@ -445,8 +444,17 @@ def automata_main():
             clock.resume()
             C.change_hexagon_states(hexagons)        
             C.update_grid(hexagons, clock.time)
+
+            if not any(hexagon.state == 2 for hexagon in hexagons):
+                unburned_cells = sum(1 for hexagon in hexagons if hexagon.state == 0)
+                total_cells = sum(1 for hexagon in hexagons if hexagon.state in [0, 3])
+                dirt_cells = sum(1 for hexagon in hexagons if hexagon.state == 1)
+                clock.pause()
+                end_screen(clock.time, unburned_cells, total_cells, dirt_cells)
         else:
             clock.pause()
+
+        
         
         C.render(G.SCREEN, hexagons)
 
@@ -520,6 +528,76 @@ def main():
                     options()
                 if exitButton.check_click(): 
                     terminated = True   
+   
+        pygame.display.update()
+        G.CLOCK.tick(G.FPS)
+        
+    pygame.display.quit()
+
+# * End screen
+def end_screen(simulation_time, unburned_cells, total_cells, dirt_cells):
+    """
+    Displays the end screen with options to restart or exit the simulation.
+    """
+    terminated = False
+    # End screen loop
+    while not terminated:
+        G.SCREEN.fill(G.BACKGROUND_COLOUR)
+
+        total_time =simulation_time[0] * 3600 + simulation_time[1] * 60 + simulation_time[2]
+        burned_cells = total_cells - unburned_cells - dirt_cells
+        spread_rate = burned_cells / total_time if total_time > 0 else 0
+
+        # simulation run time
+        endText = G.FONT.render(f'Simulation Complete', True, (255, 255, 255))
+        endTextRect = endText.get_rect(center=(G.SCREEN_WIDTH/2, 100))
+        G.SCREEN.blit(endText, endTextRect)
+
+        # Display the number of unburned, dirt and total cells (column layout)
+        stats_totalruntime = G.FONT.render(f'Total Time: {int(total_time)} sec', True, (255, 255, 255))
+        stats_total = G.FONT.render(f'Total Cells: {total_cells}', True, (255, 255, 255))
+        stats_dirt = G.FONT.render(f'Dirt Cells: {dirt_cells}', True, (255, 255, 255))
+        stats_unburned = G.FONT.render(f'Unburned Cells: {unburned_cells}', True, (255, 255, 255))
+        stats_burnrate = G.FONT.render(f'Burn Rate: {spread_rate:.2f} cells/sec', True, (255, 255, 255))
+        stats_percent = G.FONT.render(f'% Unburned: {unburned_cells / total_cells * 100:.2f}%', True, (255, 255, 255))
+
+        stats_totalruntime_rect = stats_totalruntime.get_rect(center=(G.SCREEN_WIDTH/2, 175))
+        stats_total_rect = stats_total.get_rect(center=(G.SCREEN_WIDTH/2, 250))
+        stats_dirt_rect = stats_dirt.get_rect(center=(G.SCREEN_WIDTH/2, 225))
+        stats_unburned_rect = stats_unburned.get_rect(center=(G.SCREEN_WIDTH/2, 200))
+        stats_burnrate_rect = stats_burnrate.get_rect(center=(G.SCREEN_WIDTH/2, 275))
+        stats_percent_rect = stats_percent.get_rect(center=(G.SCREEN_WIDTH/2, 300))
+
+        G.SCREEN.blit(stats_totalruntime, stats_totalruntime_rect)
+        G.SCREEN.blit(stats_total, stats_total_rect)
+        G.SCREEN.blit(stats_dirt, stats_dirt_rect)
+        G.SCREEN.blit(stats_unburned, stats_unburned_rect)
+        G.SCREEN.blit(stats_burnrate, stats_burnrate_rect)
+        G.SCREEN.blit(stats_percent, stats_percent_rect)
+
+        # End screen buttons
+        restartButton = Button('Restart', ((G.SCREEN_WIDTH / 2) - 325, 800), [300, 150, 48])
+        exitButton = Button('Back', ((G.SCREEN_WIDTH / 2) + 25, 800), [300, 150, 48])
+
+        restartButton.draw()
+        exitButton.draw()
+
+        if restartButton.check_click():
+            restartButton.draw(True)
+        if exitButton.check_click():
+            exitButton.draw(True)
+
+        # Event handler
+        for event in pygame.event.get():
+            # Quit
+            if event.type == pygame.QUIT:
+                terminated = True
+            # On click
+            if event.type == pygame.MOUSEBUTTONUP:
+                if restartButton.check_click(): 
+                    automata_main()
+                if exitButton.check_click(): 
+                    main()   
    
         pygame.display.update()
         G.CLOCK.tick(G.FPS)

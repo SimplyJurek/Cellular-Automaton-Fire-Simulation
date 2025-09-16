@@ -52,7 +52,7 @@ class HexagonTile:
     radius: float
     position: Tuple[float, float]
     colour: Tuple[int, ...] = (0, 120, 0)
-    state: int = 0
+    state: int = 0 # 0 - unburned, 1 - dirt, 2 - burning, 3 - burned
     nextstate: int = 0
     neighbours_dict: dict = None
     cellHumidity: float = 0

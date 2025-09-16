@@ -252,4 +252,3 @@ def map_resistance_to_green(resistance):
     green_value = int((1 - normalized_health) * min_green + normalized_health * max_green)
 
     return green_value
-
